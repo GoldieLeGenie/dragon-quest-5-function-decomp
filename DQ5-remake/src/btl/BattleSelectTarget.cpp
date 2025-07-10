@@ -1,0 +1,10 @@
+﻿#include "btl/BattleSelectTarget.h"
+#include "btl/BattleSelectTargetParam.h"
+#include "ar/rand.h"
+#include "dq5/CharacterType.h"
+#include "status/BattleContext.h"  
+#include "status/PartyStatus.h"
+#include "status/MonsterParty.h"
+#include "status/MonsterStatus.h"
+#include "status/HaveStatusInfo.h"
+

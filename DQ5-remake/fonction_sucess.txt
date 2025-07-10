@@ -1,0 +1,329 @@
+------------------------------------------------------------
+✔️ Fichier : BaseHaveItem.cpp
+------------------------------------------------------------
+
+- addNum(itemIndex, count)             → OK
+- getMaxCount()                        → OK 
+- getItem(index)                       → OK 
+- getItemCount(index)                 → OK 
+- getCount()                           → OK
+- isItem(itemIndex)                    → OK 
+- sort()                               → OK 
+- add(itemIndex)                       → OK 
+- del(ctrlId)                          → OK 
+- delOne(ctrlId)                       → OK 
+- isEquipment(index)                   → OK 
+- resetEquipment(index)                → OK 
+- resetEquipmentWithItemIndex(id)     → OK 
+- setEquipment(index)                  → OK 
+- getItemSortIndex(itemIndex)          → OK
+- getItemMax()                         → OK
+- getItemData(index)                   → OK 
+- clear()                              → OK 
+- setSpell(index, flag)                → OK 
+- isSpell(index)                       → OK 
+
+------------------------------------------------------------
+✔️ Fichier : UseActionFlag.cpp
+------------------------------------------------------------
+
+setZaoraruInvalid()              
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier : UseItem.cpp
+------------------------------------------------------------
+
+give()
+→ OK 
+
+isCurse()
+→ OK 
+
+isOrder()
+→ OK 
+
+isEquipEnable()
+→ OK 
+
+isLost()
+→ OK 
+
+isBattleUse()
+→ OK 
+
+isUsuallyUse()
+→ OK 
+
+isResult()
+→ OK 
+
+getEquipValue()
+→ OK
+
+getEquipType()
+→ OK
+
+getEquipItemType()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier : UseActionParam.cpp
+------------------------------------------------------------
+
+setActionIndex()                
+→ OK
+
+setPlayerEffectValue()
+→ OK
+
+setMonsterEffectValue()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier : UseActionMessage.cpp
+------------------------------------------------------------
+
+clear()    
+→ OK 
+
+------------------------------------------------------------
+✔️ Fichier : UseActionFlag.cpp
+------------------------------------------------------------
+
+- setZaoraruInvalid()
+  → OK
+
+------------------------------------------------------------
+✔️ Fichier : UseAction.cpp
+------------------------------------------------------------
+
+isForceE()              
+→ OK
+
+isMultiF()
+→ OK
+
+isSpecialSelectTarget()
+→ OK
+
+isCrossFire()
+→ OK
+
+getEffectValueToPlayer()
+→ OK
+
+getEffectValueToMonster()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier : StageAttribute.cpp
+------------------------------------------------------------
+
+isCarriageEnable()                  
+→ OK 
+
+isCarriageEnter()                    
+→ OK 
+
+------------------------------------------------------------
+✔️ Fichier : HaveStatusInfo.cpp
+------------------------------------------------------------
+
+getHp()                               
+→ OK
+
+isDeath()
+→ OK                            
+
+clearHpInBattle()                    
+→ OK
+
+clearMpInBattle()                    
+→ OK
+
+clearStatusChangeInBattle()
+→ OK
+
+isMultiAttack()
+→ OK
+
+setMultiAttack()
+→ OK
+
+setImmediateDeathItem()
+→ OK
+
+getAttack()
+→ OK
+
+getDefence()
+→ OK
+
+isKaishin()
+→ OK
+
+isTsukon1()
+→ OK
+
+isTsukon2()
+→ OK
+
+getHpMax()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier : HaveStatus.cpp
+------------------------------------------------------------
+
+getHp()                              
+→ OK 
+
+addBaseMp(mp)                        
+→ OK 
+
+setHp()
+→ OK 
+
+setHp()
+→ OK 
+
+------------------------------------------------------------
+✔️ Fichier : HaveAction.cpp
+------------------------------------------------------------
+
+setMode()
+→ OK          
+         
+isBattleMode()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier : BasePartyStatus.cpp
+------------------------------------------------------------
+
+setGold()                    
+→ OK 
+
+addGold()                         
+→ OK ()
+
+setBankMoney()               
+→ OK ()
+
+addBankMoney()               
+→ OK ()
+
+setCasinoCoin()             
+→ OK
+
+setMedalCoin()              
+→ OK
+
+addMedalCoin()                   
+→ OK ()
+
+isCarriageEnter()                  
+→ OK ()
+
+reflectBattleGold()                 
+→ OK ()
+
+getBattleGold()                     
+→ OK ()
+
+getBattleExp()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier :  BaseActionStatus.cpp 
+------------------------------------------------------------
+
+clear() 
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier :  StatusChangeOne.cpp 
+------------------------------------------------------------
+isEnable()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier :  isNormalAttack.cpp 
+------------------------------------------------------------
+isNormalAttack()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier :  isMultiTargetEquipment.cpp 
+------------------------------------------------------------
+
+isMultiTargetEquipment()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier :  isDoubleAction.cpp 
+------------------------------------------------------------
+
+isDoubleAction()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier :  HaveItem.cpp 
+------------------------------------------------------------
+
+isEquipmentInAllItem()
+→ OK
+
+getEquipmentItem()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier :  HaveEquipment.cpp 
+------------------------------------------------------------
+isEquipment()
+→ OK
+
+getEquipment()
+→ OK
+
+calcEffect()
+→ OK
+
+calcEffect(dq5::level::ItemType type)
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier :  HaveBattleStatus.cpp 
+------------------------------------------------------------
+
+getParupunteAction()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier :  getUsuallyAttackEffectValue.cpp
+------------------------------------------------------------
+
+getUsuallyAttackEffectValue()
+→ OK
+
+------------------------------------------------------------
+✔️ Fichier :  getRandomVariation.cpp
+------------------------------------------------------------
+
+getRandomVariation()
+→ OK
+
+------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+Tests validés dans main.cpp avec valeurs contrôlées et cas de clamp
