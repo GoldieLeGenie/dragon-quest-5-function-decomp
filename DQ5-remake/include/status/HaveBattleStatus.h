@@ -83,6 +83,8 @@ namespace status {
         int mosyasActionCount_;                // 0xAC
         /*void setupParupunteAction();*/
         static int getParupunteAction(HaveBattleStatus*, bool event);
+        static void setActionFailed(HaveBattleStatus* self, int actionIndex);
+        static void setActionIndexForMonster(HaveBattleStatus* self);
         static bool eventFlag_;
     };
 } 

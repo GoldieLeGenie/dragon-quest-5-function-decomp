@@ -28,7 +28,7 @@ namespace status {
             THROW_MAX = 0x3,
         };
 
-
+        void initialize();
         void give(BaseHaveItem* srcHaveItem, int index, BaseHaveItem* desHaveItem);
         bool isCurse(int itemIndex);
         bool isOrder(int itemIndex);
@@ -59,15 +59,16 @@ namespace status {
         int getTypeSortIndex(int itemIndex);
         int getUseAction(int itemIndex);
         void getUseArea(int itemIndex);
-
-
-
-
-
-
-
-
-
+        void execUse(UseActionParam* useActionParam);
+        void execThrow(int index, BaseHaveItem* haveItem);
+        int getJudgeMessageCount(int itemIndex);
+        void give2(HaveStatusInfo_0* srcHaveStatusInfo, int srcIndex, HaveStatusInfo_0* desHaveStatusInfo, int desIndex);
+        void give2(HaveItemSack* srcHaveItemSack, int srcIndex, HaveStatusInfo_0* desHaveStatusInfo, int desIndex);
+        void give2(HaveStatusInfo_0* srcHaveStatusInfo,int srcIndex,HaveItemSack* desHaveItemSack,int desIndex);
+        void give(HaveStatusInfo_0* srcHaveStatusInfo, int index, HaveStatusInfo_0* desHaveStatusInfo);
+        void execBattleUse(UseActionParam* useActionParam);
+        void getUseType(int itemIndex);
+        void setItemRecord(int index);
         static const short en_tbl[275] = {
         };
         static const short ko_tbl[275] = {

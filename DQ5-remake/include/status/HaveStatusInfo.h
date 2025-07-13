@@ -23,7 +23,7 @@ namespace status {
         MaxAction = 4
     };
 
-    struct alignas(8) HaveStatusInfo {
+    struct HaveStatusInfo {
         int hp_[4];                          // 0x00
         int mp_[4];                          // 0x10
         ar::Flag32 status_[8];              // 0x20
@@ -82,6 +82,7 @@ namespace status {
         static void setHp(HaveStatusInfo_0* self, uint16_t hp);
         static int setItemEquipment(HaveStatusInfo_0* self, int itemIndex);
         static void setEquipment(HaveStatusInfo_0* self, int index);
+        static void resetEquipment(HaveStatusInfo_0* self, int index);
         /*void clearStatusChangeInBattle();
         void setStatusChangeInBattle(DiffStatus status);*/ // ✅ retiré le `static`
     };

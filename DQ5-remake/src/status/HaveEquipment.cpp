@@ -121,4 +121,7 @@ void status::HaveEquipment::calcEffect(status::HaveEquipment* self, int itemInde
     }
 }
 
-
+void status::HaveEquipment::resetEquipment(HaveEquipment* self, int itemIndex)
+{
+   
+}

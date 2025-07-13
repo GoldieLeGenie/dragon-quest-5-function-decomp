@@ -2,11 +2,11 @@
 #include <cstdint>
 #include "status/ItemData.h"
 
-#pragma pack(push, 1)
+
 
 namespace status {
 
-    struct alignas(4) BaseHaveItem {
+    struct BaseHaveItem {
         ~BaseHaveItem();
         BaseHaveItem& operator=(const BaseHaveItem& rhs);
 
@@ -32,7 +32,7 @@ namespace status {
         static void resetEquipmentWithItemIndex(BaseHaveItem* self, int itemIndex);
         static void setEquipment(BaseHaveItem* self, int index);
         static int getItemMax(BaseHaveItem* self);
-        ItemData* getItemData(BaseHaveItem* self,int index);
+        static ItemData* getItemData(BaseHaveItem* self,int index);
         BaseHaveItem(ItemData* itemData, int itemMax);
         static void clear(BaseHaveItem* self);
         static void setSpell(BaseHaveItem* self,int index, bool flag);
@@ -43,4 +43,3 @@ namespace status {
     
 } // namespace status
 
-#pragma pack(pop)

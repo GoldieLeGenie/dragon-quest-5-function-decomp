@@ -8,10 +8,7 @@
 namespace status {
 
     struct CharacterStatus {
-        // Vtable (pour les méthodes virtuelles)
-        void** _vptr$CharacterStatus;
-
-        // Type de personnage (joueur, monstre, etc.)
+   
         dq5::level::CharacterType characterType_;           // 0x04
 
         // Infos de statut global (objets, compétences, etc.)

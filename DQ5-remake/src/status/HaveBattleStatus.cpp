@@ -1,6 +1,7 @@
 ﻿#include "status/HaveBattleStatus.h"
 #include "status/StageAttribute.h"
 #include "ar/rand.h"
+#include "dq5/MonsterData.h"
 
 
 
@@ -30,6 +31,48 @@ int status::HaveBattleStatus::getParupunteAction(HaveBattleStatus*, bool event) 
 }
 
 
+void status::HaveBattleStatus::setActionFailed(HaveBattleStatus* self, int actionIndex) {
+    const int originalPatternIndex = self->patternIndex_;
+
+    for (int i = 0; i < 6; ++i) {
+        self->patternIndex_ = i;
+        status::HaveBattleStatus::setActionIndexForMonster(self);
+        self->patternFailedFlag_.set(i);
+    }
+
+    self->patternIndex_ = originalPatternIndex;
+}
 
 
+void status::HaveBattleStatus::setActionIndexForMonster(HaveBattleStatus* self) {
+    // Récupération du record depuis les données binaires
+    void* record = dq5::level::MonsterData::binary_.getRecord(
+        self->index_,
+        dq5::level::MonsterData::addr_,
+        dq5::level::MonsterData::filename_[0],
+        static_cast<ar::File::LoadSwitch>(dq5::level::MonsterData::loadSwitch_)
+    );
+
+    if (!record) return;  // Sécurité si record non trouvé
+
+    // Cast vers la bonne structure
+    dq5::level::MonsterData* monsterData = static_cast<dq5::level::MonsterData*>(record);
+
+    // Sauvegarde dans la variable globale
+    dq5::level::monsterData2_ = monsterData;
+
+    // On déduit l'action selon le patternIndex_
+    uint16_t actionValue = 0;
+    switch (self->patternIndex_) {
+    case 0: actionValue = monsterData->action1; break;
+    case 1: actionValue = monsterData->action2; break;
+    case 2: actionValue = monsterData->action3; break;
+    case 3: actionValue = monsterData->action4; break;
+    case 4: actionValue = monsterData->action5; break;
+    case 5: actionValue = monsterData->action6; break;
+    default: return;  // Rien à faire
+    }
+
+    self->actionIndex_ = static_cast<int>(actionValue);
+}
 

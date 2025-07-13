@@ -163,9 +163,7 @@ void status::BaseHaveItem::resetEquipmentWithItemIndex(BaseHaveItem* self, int i
         if (self->item_[i].index_ == itemIndex && self->item_[i].flag_.test(0)) {
             self->item_[i].flag_.clear(0);
 
-            using VFunc = void(__fastcall*)(BaseHaveItem*);
-            VFunc onEquipmentChanged = reinterpret_cast<VFunc>(self->_vptr$BaseHaveItem[3]);
-            return;
+           
         }
     }
 }
@@ -181,8 +179,7 @@ void status::BaseHaveItem::setEquipment(BaseHaveItem* self, int index) {
         item.flag_.set(1);
     }
 
-    using VFunc = void(__fastcall*)(BaseHaveItem*);
-    VFunc onEquipmentChanged = reinterpret_cast<VFunc>(self->_vptr$BaseHaveItem[3]);
+    status::BaseHaveItem::sortEquipment(self);
 
 }
 

@@ -27,6 +27,7 @@ namespace status {
         static void calcEffect(HaveEquipment* self);
         static void calcEffect(HaveEquipment* self, int itemIndex, dq5::level::ItemType type);
         static int getEquipment(const HaveEquipment* self, dq5::level::ItemType type, int index);
+        static void resetEquipment(HaveEquipment* self, int itemIndex);
     };
 
 } 

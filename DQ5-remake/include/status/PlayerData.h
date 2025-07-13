@@ -1,16 +1,16 @@
 #pragma once
-
-#include "ar/Flag8.h"
-#include "dq5/Sex.h"
+#include "ar/BitFlag.h"
+#include "dq5/dq5Sex.h"
 #include "status/BaseStatus.h"
 #include "status/HaveItem.h"
 #include "status/HaveAction.h"
 #include "status/HaveEquipment.h"
+#include "status/PlayerDataAll.h"
 #include <cstdint>
 
 namespace status {
 
-struct alignas(4) PlayerData {
+struct PlayerData {
     uint8_t index_;                 // 0x000
     uint8_t kindIndex_;            // 0x001
     uint16_t nameId_;              // 0x002
@@ -25,8 +25,18 @@ struct alignas(4) PlayerData {
     uint32_t nextLevelExp_;       // 0x0EC
     HaveEquipment haveEquipment_; // 0x0F0 - 0x10F
     bool cursedName_;             // 0x110
-};
+    static bool isCurse4(PlayerData* self);
+    static bool isCurse5(PlayerData* self);
+    static bool isPoison(PlayerData* self);
+    static bool isVenom(PlayerData* self);
+    static void setCurse4(PlayerData* self, bool flag);
+    static void setCurse5(PlayerData* self, bool flag);
+    static void setPoison(PlayerData* self, bool flag);
+    static void setVenom(PlayerData* self, bool flag);
+    static int getCharacterKind(PlayerData* self);
+    static uint16_t getActionMonsterIndex(PlayerData* self);
+    static int getAttack(PlayerData* self);
 
-static_assert(sizeof(PlayerData) == 0x114, "PlayerData must be exactly 0x114 bytes.");
+};
 
 } // namespace status

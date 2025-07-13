@@ -9,6 +9,7 @@
 #include "status/BaseItem.h"
 #include "status/UseAction.h"
 #include <cstdint>
+#include "iostream"
 
 uintptr_t status::UseItem::itemData2_;
 
@@ -19,33 +20,37 @@ int g_Lang = 0;
 
 void status::UseItem::give(status::BaseHaveItem* srcHaveItem, int index, status::BaseHaveItem* desHaveItem)
 {
-    int Count; 
-    int v7; 
-    int Item; 
-    int v9; 
-    int v10; 
-    int v11; 
+    int desCount = status::BaseHaveItem::getCount(desHaveItem);
+    int desMax = status::BaseHaveItem::getItemMax(desHaveItem);
 
-    Count = status::BaseHaveItem::getCount(desHaveItem);
-    if (Count == status::BaseHaveItem::getItemMax(desHaveItem))
+    if (desCount == desMax)
     {
-        if (status::BaseHaveItem::getItemMax(desHaveItem) != 99)
+        // Cas spécial : inventaire plein mais max < 99
+        if (desMax != 99)
         {
-            v7 = status::BaseHaveItem::getCount(desHaveItem);
-            Item = status::BaseHaveItem::getItem(desHaveItem, v7 - 1);
-            v9 = status::BaseHaveItem::getCount(desHaveItem);
-            (*((void(__fastcall**)(status::BaseHaveItem*, int))desHaveItem->_vptr$BaseHaveItem + 2))(desHaveItem, v9 - 1);
-            v10 = status::BaseHaveItem::getItem(srcHaveItem, index);
-            (*((void(__fastcall**)(status::BaseHaveItem*, int))desHaveItem->_vptr$BaseHaveItem + 1))(desHaveItem, v10);
-            (*((void(__fastcall**)(status::BaseHaveItem*, int))srcHaveItem->_vptr$BaseHaveItem + 2))(srcHaveItem, index);
-            (*((void(__fastcall**)(status::BaseHaveItem*, int))srcHaveItem->_vptr$BaseHaveItem + 1))(srcHaveItem, Item);
+            int lastIndex = desCount - 1;
+            int lastItem = status::BaseHaveItem::getItem(desHaveItem, lastIndex);
+
+            // Supprimer le dernier objet de la destination
+            status::BaseHaveItem::del(desHaveItem, lastIndex);
+
+            // Ajouter l'objet source dans la destination
+            int itemToMove = status::BaseHaveItem::getItem(srcHaveItem, index);
+            status::BaseHaveItem::add(desHaveItem, itemToMove);
+
+            // Supprimer l’objet source de son inventaire
+            status::BaseHaveItem::del(srcHaveItem, index);
+
+            // Réinsérer l’ancien dernier objet dans la source
+            status::BaseHaveItem::add(srcHaveItem, lastItem);
         }
     }
     else
     {
-        v11 = status::BaseHaveItem::getItem(srcHaveItem, index);
-        (*((void(__fastcall**)(status::BaseHaveItem*, int))desHaveItem->_vptr$BaseHaveItem + 1))(desHaveItem, v11);
-        (*((void(__fastcall**)(status::BaseHaveItem*, int))srcHaveItem->_vptr$BaseHaveItem + 2))(srcHaveItem, index);
+        // Transfert direct si la destination n’est pas pleine
+        int itemToMove = status::BaseHaveItem::getItem(srcHaveItem, index);
+        status::BaseHaveItem::add(desHaveItem, itemToMove);
+        status::BaseHaveItem::del(srcHaveItem, index);
     }
 }
 
@@ -568,6 +573,21 @@ int status::UseItem::getUseAction(int itemIndex) {
 }
 
 
+void status::UseItem::getUseType(int itemIndex)
+{
+    // Récupérer le pointeur vers l'enregistrement ItemData
+    void* record = dq5::level::ItemData::binary_.getRecord(
+        itemIndex,
+        dq5::level::ItemData::addr_,
+        dq5::level::ItemData::filename_[0],
+        static_cast<ar::File::LoadSwitch>(dq5::level::ItemData::loadSwitch_)
+    );
+    status::UseItem::itemData2_ = reinterpret_cast<uintptr_t>(record);
+    uint16_t useType = *reinterpret_cast<const uint16_t*>(
+        static_cast<const char*>(record) + 24
+        );
+    status::UseAction::getUseType(useType);
+}
 
 void status::UseItem::getUseArea(int itemIndex) {
     void* record = dq5::level::ItemData::binary_.getRecord(
@@ -589,18 +609,324 @@ void status::UseItem::getUseArea(int itemIndex) {
 
 
 
+void status::UseItem::execUse(UseActionParam* useActionParam)
+{
+    auto* actorSack = useActionParam->actorHaveItemSack_;
+    int sortIndex = useActionParam->itemSortIndex_;
+    int itemId = 0;
+
+    if (actorSack) {
+        itemId = status::BaseHaveItem::getItem(actorSack, sortIndex);
+        status::UseItem::itemIndex_ = itemId;
+    }
+    else if (auto* actor = useActionParam->actorCharacterStatus_) {
+        itemId = status::BaseHaveItem::getItem(&actor->haveStatusInfo_.haveItem_, sortIndex);
+        status::UseItem::itemIndex_ = itemId;
+        useActionParam->itemIndex_ = itemId;
+    }
+    else {
+        itemId = status::UseItem::itemIndex_;
+    }
+
+    // Récupération des données d'objet depuis les données binaires
+    void* record = dq5::level::ItemData::binary_.getRecord(
+        itemId,
+        dq5::level::ItemData::addr_,
+        dq5::level::ItemData::filename_[0],
+        static_cast<ar::File::LoadSwitch>(dq5::level::ItemData::loadSwitch_)
+    );
+
+    // Récupère l'index de l'action de l'objet
+    status::UseItem::itemData2_ = reinterpret_cast<uintptr_t>(record);
+
+    int actionIndex = *reinterpret_cast<uint16_t*>(status::UseItem::itemData2_ + 24);
+    status::UseItem::actionIndex_ = actionIndex;
+    useActionParam->setActionIndex(useActionParam, actionIndex);
+
+    // Exécute l'action
+    status::UseAction::execUse(useActionParam);
+
+    // Si l'action a été exécutée avec succès
+    if (useActionParam->result_) {
+        record = dq5::level::ItemData::binary_.getRecord(
+            status::UseItem::itemIndex_,
+            dq5::level::ItemData::addr_,
+            dq5::level::ItemData::filename_[0],
+            static_cast<ar::File::LoadSwitch>(dq5::level::ItemData::loadSwitch_)
+        );
+
+        if (*reinterpret_cast<uint8_t*>(status::UseItem::itemData2_ + 39) & 0x2) {
+            if (actorSack) {
+                status::UseItem::itemIndex_ = status::BaseHaveItem::del(actorSack, sortIndex);
+            }
+            else if (auto* actor = useActionParam->actorCharacterStatus_) {
+                status::BaseHaveItem::del(&actor->haveStatusInfo_.haveItem_, sortIndex);
+            }
+        }
+
+        // Si l'anneau de prière est brisé, on le retire aussi
+        if (status::UseActionFlag::isBreakPrayRing()) {
+            status::UseActionFlag::setBreakPrayRing(false);
+
+            if (actorSack) {
+                status::UseItem::itemIndex_ = status::BaseHaveItem::del(actorSack, sortIndex);
+            }
+            else if (auto* actor = useActionParam->actorCharacterStatus_) {
+                status::BaseHaveItem::del(&actor->haveStatusInfo_.haveItem_, sortIndex);
+            }
+        }
+    }
+}
+
+
+void status::UseItem::execThrow(int index, BaseHaveItem* haveItem)
+{
+    status::BaseHaveItem::del(haveItem,index);
+}
 
 
 
+int status::UseItem::getJudgeMessageCount(int itemIndex)
+{
+    void* record = dq5::level::AppriseItem::binary_.getRecord(
+        itemIndex,
+        dq5::level::AppriseItem::addr_,
+        dq5::level::AppriseItem::filename_[0],
+        static_cast<ar::File::LoadSwitch>(dq5::level::AppriseItem::loadSwitch_)
+    );
+
+    if (!record)
+        return 0;
+
+    int* data = static_cast<int*>(record);
+
+    int count = 1;  // v7
+
+    int v2 = data[1];  // champ 1
+    int v3 = data[2];  // champ 2
+    int v4 = data[3];  // champ 3
+    int v5 = data[4];  // champ 4
+    int v6 = data[5];  // champ 5
+    int v8 = data[6];  // champ 6
+    int v9 = data[7];  // champ 7
+
+    // Si le premier champ (data[1]) est non nul, on commence à 2
+    if (v2)
+        count = 2;
+
+    // Si data[2] est non nul, le count ne change pas (on garde count)
+    if (v3)
+        count = count;
+
+    // Si data[3] à data[7] sont non nuls, on incrémente
+    if (v4) ++count;
+    if (v5) ++count;
+    if (v6) ++count;
+    if (v8) ++count;
+    if (v9) ++count;
+
+    return count;
+}
+
+void status::UseItem::give2(HaveStatusInfo_0* srcHaveStatusInfo,int srcIndex,HaveStatusInfo_0* desHaveStatusInfo,int desIndex)
+{
+    status::HaveItem* srcHaveItem = &srcHaveStatusInfo->haveItem_;
+    bool isEquipment = status::BaseHaveItem::isEquipment(srcHaveItem, srcIndex);
+
+    if (desIndex == -1)
+    {
+        int itemId = 0;
+        if (isEquipment)
+            itemId = status::BaseHaveItem::getItem(srcHaveItem, srcIndex);
+
+        status::UseItem::give(srcHaveItem, srcIndex, &desHaveStatusInfo->haveItem_);
+
+        if (isEquipment)
+            status::HaveEquipment::resetEquipment(&srcHaveStatusInfo->haveEquipment_, itemId);
+    }
+    else
+    {
+        if (isEquipment)
+        {
+            int itemId = status::BaseHaveItem::getItem(srcHaveItem, srcIndex);
+            status::HaveEquipment::resetEquipment(&srcHaveStatusInfo->haveEquipment_, itemId);
+        }
+
+        if (status::BaseHaveItem::isEquipment(&desHaveStatusInfo->haveItem_, desIndex))
+        {
+            int itemId = status::BaseHaveItem::getItem(&desHaveStatusInfo->haveItem_, desIndex);
+            status::HaveEquipment::resetEquipment(&desHaveStatusInfo->haveEquipment_, itemId);
+        }
+
+        status::ItemData* srcItemData = status::BaseHaveItem::getItemData(srcHaveItem, srcIndex);
+        status::ItemData* desItemData = status::BaseHaveItem::getItemData(&desHaveStatusInfo->haveItem_, desIndex);
+
+        status::ItemData::setEquipment(srcItemData + 3, false);
+        status::ItemData::setEquipment(desItemData + 3, false);
+
+        std::swap((srcItemData + 3)->index_, (desItemData + 3)->index_);
+        status::HaveItem::sortEquipment(srcHaveItem);
+        status::HaveItem::sortEquipment(&desHaveStatusInfo->haveItem_);
+    }
+}
 
 
 
+void status::UseItem::give2(HaveItemSack* srcHaveItemSack,int srcIndex,HaveStatusInfo_0* desHaveStatusInfo,int desIndex)
+{
+    if (desIndex == -1) {
+        status::UseItem::give(srcHaveItemSack, srcIndex, &desHaveStatusInfo->haveItem_);
+    }
+    else {
+        if (status::BaseHaveItem::isEquipment(&desHaveStatusInfo->haveItem_, desIndex)) {
+            int itemId = status::BaseHaveItem::getItem(&desHaveStatusInfo->haveItem_, desIndex);
+            status::HaveEquipment::resetEquipment(&desHaveStatusInfo->haveEquipment_, itemId);
+        }
+
+        status::ItemData* srcItemData = status::BaseHaveItem::getItemData(srcHaveItemSack, srcIndex);
+        status::ItemData* desItemData = reinterpret_cast<status::ItemData*>(
+            reinterpret_cast<char*>(&desHaveStatusInfo->hp_[desIndex]) + sizeof(status::ItemData) * 62
+            );
+
+        int oldIndex = desItemData->index_;
+        desItemData->index_ = srcItemData->index_;
+        status::ItemData::setEquipment(desItemData, false);
+        status::HaveItemSack::del(srcHaveItemSack, srcIndex);
+        status::HaveItemSack::add(srcHaveItemSack, oldIndex);
+    }
+}
+
+void status::UseItem::give2(HaveStatusInfo_0* srcHaveStatusInfo,int srcIndex,HaveItemSack* desHaveItemSack,int desIndex)
+{
+    status::HaveItem* srcHaveItem = &srcHaveStatusInfo->haveItem_;
+    bool isEquipment = status::BaseHaveItem::isEquipment(srcHaveItem, srcIndex);
+
+    if (desIndex == -1) {
+        int itemId = 0;
+        if (isEquipment)
+            itemId = status::BaseHaveItem::getItem(srcHaveItem, srcIndex);
+
+        status::UseItem::give(srcHaveItem, srcIndex, desHaveItemSack);
+
+        if (isEquipment)
+            status::HaveEquipment::resetEquipment(&srcHaveStatusInfo->haveEquipment_, itemId);
+    }
+    else {
+        if (isEquipment)
+            status::HaveStatusInfo::resetEquipment(srcHaveStatusInfo, srcIndex);
+
+        // Lire l’item ID dans le sac destination
+        uint8_t itemId = status::BaseHaveItem::getItem(desHaveItemSack, desIndex);
+
+        // Accès à l’entrée HP du personnage source
+        uint16_t& statusItemIndex = reinterpret_cast<uint16_t*>(
+            &srcHaveStatusInfo->hp_[srcIndex]
+            )[124];  // offset 124 → champ index_
+
+        // add l’ancien item dans le sac
+        status::HaveItemSack::add(desHaveItemSack, statusItemIndex);
+
+        // remove l’objet à desIndex
+        status::HaveItemSack::del(desHaveItemSack, desIndex);
+
+        // remplacer l’index dans HaveStatusInfo_0 par celui du nouvel item
+        statusItemIndex = itemId;
+    }
+}
 
 
+void status::UseItem::give(HaveStatusInfo_0* srcHaveStatusInfo,int index,HaveStatusInfo_0* desHaveStatusInfo)
+{
+    status::HaveItem* srcHaveItem = &srcHaveStatusInfo->haveItem_;
+    int itemId = 0;
+
+    // Si c’est un équipement, récupérer son ID pour déséquipement après
+    if (status::BaseHaveItem::isEquipment(srcHaveItem, index)) {
+        itemId = status::BaseHaveItem::getItem(srcHaveItem, index);
+    }
+
+    // Transfert de l’objet vers la destination
+    status::UseItem::give(srcHaveItem, index, &desHaveStatusInfo->haveItem_);
+
+    // Déséquipement si nécessaire
+    if (itemId != 0) {
+        status::HaveEquipment::resetEquipment(&srcHaveStatusInfo->haveEquipment_, itemId);
+    }
+}
+
+void status::UseItem::execBattleUse(UseActionParam* useActionParam)
+{
+    int itemSortIndex = useActionParam->itemSortIndex_;
+
+    // Récupérer l’ID de l’objet dans l’inventaire du personnage
+    int itemId = status::BaseHaveItem::getItem(
+        &useActionParam->actorCharacterStatus_->haveStatusInfo_.haveItem_,
+        itemSortIndex
+    );
+
+    // Mémoriser l’item utilisé
+    status::UseItem::itemIndex_ = itemId;
+    useActionParam->itemIndex_ = itemId;
+
+    // Récupérer les données binaires de l’objet (ItemData)
+    void* record = dq5::level::ItemData::binary_.getRecord(
+        itemId,
+        dq5::level::ItemData::addr_,
+        dq5::level::ItemData::filename_[0],
+        static_cast<ar::File::LoadSwitch>(dq5::level::ItemData::loadSwitch_)
+    );
+
+    status::UseItem::itemData2_ = reinterpret_cast<uintptr_t>(record);
+
+    // Lire l'actionIndex à l’offset +26 (uint16_t)
+    uint16_t actionIndex = *reinterpret_cast<const uint16_t*>(
+        static_cast<const char*>(record) + 26
+        );
+
+    status::UseItem::actionIndex_ = actionIndex;
+    status::UseActionParam::setActionIndex(useActionParam, actionIndex);
+
+    // Exécuter l’action liée à l’objet
+    status::UseAction::execUse(useActionParam);
+
+    // Recharger le record (si modifié entre-temps)
+    record = dq5::level::ItemData::binary_.getRecord(
+        status::UseItem::itemIndex_,
+        dq5::level::ItemData::addr_,
+        dq5::level::ItemData::filename_[0],
+        static_cast<ar::File::LoadSwitch>(dq5::level::ItemData::loadSwitch_)
+    );
+
+    status::UseItem::itemData2_ = reinterpret_cast<uintptr_t>(record);
+
+    // Vérifier s’il est consommable (bit 1 à l’offset +39)
+    uint8_t flag = *reinterpret_cast<const uint8_t*>(
+        static_cast<const char*>(record) + 39
+        );
+
+    if (flag & 0x02)
+    {
+        status::BaseHaveItem::del(
+            &useActionParam->actorCharacterStatus_->haveStatusInfo_.haveItem_,
+            itemSortIndex
+        );
+    }
+}
 
 
+void status::UseItem::setItemRecord(int index)
+{
+    void* record = dq5::level::ItemData::binary_.getRecord(
+        index,
+        dq5::level::ItemData::addr_,
+        dq5::level::ItemData::filename_[0],
+        static_cast<ar::File::LoadSwitch>(dq5::level::ItemData::loadSwitch_)
+    );
+ 
+    status::UseItem::itemData2_ = reinterpret_cast<uintptr_t>(record);
+}
 
-
-
-
-
+void status::UseItem::initialize()
+{
+    // No initialization required
+}

@@ -15,6 +15,7 @@
 namespace status {
     // Déclaration anticipée pour résoudre la dépendance croisée
     struct HaveBattleStatus;
+    struct HaveStatusInfo;
 
     struct HaveStatusInfo_0 {
         int hp_[4];                          // 0x00

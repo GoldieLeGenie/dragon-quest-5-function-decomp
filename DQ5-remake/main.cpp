@@ -36,7 +36,10 @@
 
 
 
-
+int main() {
+    std::cout << "DQ5 remake running!" << std::endl;
+    return 0;
+}
 
 // Simule une initialisation de ActionParam
 //void initActionParam() {

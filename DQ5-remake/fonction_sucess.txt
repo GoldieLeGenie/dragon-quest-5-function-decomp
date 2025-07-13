@@ -31,7 +31,7 @@ setZaoraruInvalid()
 → OK
 
 ------------------------------------------------------------
-✔️ Fichier : UseItem.cpp
+✔️ Fichier : UseItem.cpp DONE
 ------------------------------------------------------------
 
 give()
@@ -68,7 +68,7 @@ getEquipItemType()
 → OK
 
 ------------------------------------------------------------
-✔️ Fichier : UseActionParam.cpp
+✔️ Fichier : UseActionParam.cpp DONE
 ------------------------------------------------------------
 
 setActionIndex()                
@@ -81,14 +81,14 @@ setMonsterEffectValue()
 → OK
 
 ------------------------------------------------------------
-✔️ Fichier : UseActionMessage.cpp
+✔️ Fichier : UseActionMessage.cpp DONE
 ------------------------------------------------------------
 
 clear()    
 → OK 
 
 ------------------------------------------------------------
-✔️ Fichier : UseActionFlag.cpp
+✔️ Fichier : UseActionFlag.cpp DONE
 ------------------------------------------------------------
 
 - setZaoraruInvalid()
@@ -243,7 +243,7 @@ clear()
 → OK
 
 ------------------------------------------------------------
-✔️ Fichier :  StatusChangeOne.cpp 
+✔️ Fichier :  StatusChangeOne.cpp DONE
 ------------------------------------------------------------
 isEnable()
 → OK

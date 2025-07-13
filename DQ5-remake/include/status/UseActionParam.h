@@ -9,7 +9,7 @@
 
 namespace status {
 
-    struct alignas(8) UseActionParam {
+    struct UseActionParam {
         CharacterStatus* actorCharacterStatus_;
         CharacterStatus* targetCharacterStatus_[18];
         bool targetResult_[18];
@@ -34,6 +34,9 @@ namespace status {
         static void setActionIndex(UseActionParam* self, int actionIndex);
         static void setPlayerEffectValue(UseActionParam* self, int value);
         static void setMonsterEffectValue(UseActionParam* self, int value);
+        static void clear(UseActionParam* self);
+        static void clearMessage(UseActionParam* self);
+        UseActionParam();
     };
 
 }

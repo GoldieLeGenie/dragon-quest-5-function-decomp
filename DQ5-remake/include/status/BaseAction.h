@@ -14,7 +14,7 @@ namespace status {
         static int resultFlag_;
         static int executeActor_;
         static int executeTarget_;
-
+        
         /*static void exec(UseActionParam* useActionParam, bool isBattleMode);
         static bool execMainRoot(status::CharacterStatus* actor, status::CharacterStatus* target);
         static void execActionSetup();

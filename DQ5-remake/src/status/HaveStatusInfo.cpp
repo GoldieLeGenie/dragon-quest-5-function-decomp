@@ -18,7 +18,7 @@ uint16_t status::HaveStatusInfo::getHp(const HaveStatusInfo_0* self) {
     return status::HaveStatus::getHp(&self->haveStatus_);
 }
 
-void status::HaveStatusInfo::clearHpInBattle(status::HaveStatusInfo_0* self)
+void status::HaveStatusInfo::clearHpInBattle(HaveStatusInfo_0* self)
 {
   
     status::HaveStatus* statusPtr = &self->haveStatus_;
@@ -343,5 +343,14 @@ void status::HaveStatusInfo::setEquipment(HaveStatusInfo_0* self,int index) {
 }
 
 
+void status::HaveStatusInfo::resetEquipment(HaveStatusInfo_0* self, int index)
+{
+    status::HaveItem* haveItem = &self->haveItem_;
+
+    int itemId = status::BaseHaveItem::getItem(haveItem, index);
+
+    status::HaveEquipment::resetEquipment(&self->haveEquipment_, itemId);
+    status::BaseHaveItem::resetEquipment(haveItem, index);
+}
 
 

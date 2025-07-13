@@ -7,10 +7,12 @@ namespace status {
         int index_;
         uint8_t count_;
         ar::Flag8 flag_;
-
-        ItemData() : index_(0), count_(0), flag_() {}
-
-        ItemData(int index, uint8_t count, ar::Flag8 flag)
-            : index_(index), count_(count), flag_(flag) {}
+        static bool isSpell(ItemData* self);
+        static bool isEquipment(ItemData* self);
+        static void setEquipment(ItemData* self, bool flag);
+        static void setSpell(ItemData* self, bool flag);
+        static void clear(ItemData* self);
+        ~ItemData() = default;
+        ItemData();
     };
 } 

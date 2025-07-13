@@ -39,3 +39,4 @@ int status::HaveItem::add(BaseHaveItem* self, int itemIndex)
 {
     return status::BaseHaveItem::addOne(self, itemIndex);
 }
+
