@@ -25,3 +25,30 @@ int status::BaseAction::resultFlag_ = 0;
 
 
 
+void status::BaseHaveAction::clear(BaseHaveAction* self)
+{
+	self->actionLevel_ = 0;
+	self->battleAction_ = 0;
+}
+
+
+int status::BaseHaveAction::getAction(BaseHaveAction* self)
+{
+	return self->battleAction_;
+}
+
+int status::BaseHaveAction::getUsuallyAction(BaseHaveAction* self)
+{
+	return self->usuallyAction_;
+}
+
+bool status::BaseHaveAction::isRemember(BaseHaveAction* self)
+{
+	bool noBattleAction = (self->battleAction_ == 0);
+	if (noBattleAction)
+		noBattleAction = (self->usuallyAction_ == 0);
+
+	return !noBattleAction && ((self->actionFlag_ & 4) != 0);
+}
+
+

@@ -1578,3 +1578,51 @@ int status::StatusChange::getTurn(status::StatusChange* self, dq5::level::Action
 
     return entry->turn_;
 }
+
+
+int status::StatusChange::getCount(StatusChange* self, dq5::level::ActionParam::ACTIONTYPE rel)
+{
+    status::StatusChangeOne* statuschange = &status::StatusChange::statusFizzleZone_;
+
+    switch (rel)
+    {
+    case dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_FIZZLEZONE:
+        return statuschange->count_;
+
+    case dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_TIMESTOP:
+    case dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CURSE4:
+    case dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CURSE5:
+        
+        statuschange = &status::StatusChange::statusTimeStop_;
+        if (rel != dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_TIMESTOP)
+            statuschange = &self->status_[static_cast<int>(rel)];
+        break;
+
+    case dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_TOHEROSU:
+        statuschange = &status::StatusChange::statusToherosu_;
+        break;
+
+    case dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_SINOBIASI:
+        statuschange = &status::StatusChange::statusSinobiasi_;
+        break;
+
+    case dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_NORMAL_MAMONONOESA:
+        statuschange = &status::StatusChange::statusMonstersFood_;
+        break;
+
+    default:
+        if (rel == dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CLOSEDOOR)
+        {
+            statuschange = &status::StatusChange::statusCloseDoor_;
+        }
+        else
+        {
+            statuschange = &status::StatusChange::statusTimeStop_;
+            if (rel != dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_TIMESTOP)
+                statuschange = &self->status_[static_cast<int>(rel)];
+        }
+        break;
+    }
+
+    return statuschange->count_;
+}

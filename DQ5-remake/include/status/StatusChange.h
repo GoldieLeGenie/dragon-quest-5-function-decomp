@@ -74,6 +74,7 @@ namespace status {
         static bool isEnableCloseDoor();
         static bool isCancel(StatusChange* self, dq5::level::ActionParam::ACTIONTYPE rel);
         static int getTurn(StatusChange* self, dq5::level::ActionParam::ACTIONTYPE rel);
+        static int getCount(StatusChange* self, dq5::level::ActionParam::ACTIONTYPE rel);
     };
     extern uint8_t TIMESTOP;
 

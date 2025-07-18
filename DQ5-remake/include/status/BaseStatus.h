@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <cstdint>
+#include <cstring>
 
 namespace status {
 
@@ -15,13 +16,27 @@ namespace status {
         uint8_t wisdom_;          // 0x11 : Intelligence / sagesse
         uint8_t luck_;            // 0x12 : Chance
         uint8_t level_;           // 0x13 : Niveau actuel
-        static void setHpMax(BaseStatus* self,uint16_t hp);
+        static void setHpMax(BaseStatus* self, uint16_t hp);
         static void setMpMax(BaseStatus* self,uint16_t mp);
         static void addStrength(BaseStatus* self,char str);
         static void addAgility(BaseStatus* self,char agi);
         static void addProtection(BaseStatus* self, char pr);
         static void addWisdom(BaseStatus* self, char wis);
         static void addHpMax(BaseStatus* self, char hp);
+        static void clear(BaseStatus* self);
+        static void setStrength(BaseStatus* self, uint8_t  str);
+        static void setWisdom(BaseStatus* self, uint8_t wis);
+        static void setProtection(BaseStatus* self, uint8_t pr);
+        static void setMp(BaseStatus* self, uint16_t mp);
+        static void setLuck(BaseStatus* self, uint8_t luck);
+        static void setHp(BaseStatus* self, uint16_t hp);
+        static void setAgility(BaseStatus* self, uint8_t agi);
+        static void addMpMax(BaseStatus* self, int8_t mp);
+        static void addLuck(BaseStatus* self, uint8_t lc);
+        BaseStatus() {
+            std::memset(this, 0, sizeof(*this));
+        }
+        ~BaseStatus();
         // Taille totale : 0x14 (20 octets)
     };
 

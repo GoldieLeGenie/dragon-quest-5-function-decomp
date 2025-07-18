@@ -3,8 +3,8 @@
 namespace status {
 
     struct PartyStatus {
-        //static void setBattleMode(status::PartyStatus* self);
-        //static void setParty(status::PartyStatus* self);
+        int memberCount_; // offset = 0x131
+
     
     };
 

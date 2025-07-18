@@ -2,7 +2,7 @@
 
 
 
-status::StageAttribute* status::g_StageAttribute = nullptr;
+status::StageAttribute g_StageAttribute;
 
 bool status::StageAttribute::isCarriageEnable(const StageAttribute* self){
     return (self->flag_.get() >> 8) & 1;

@@ -1,3 +1,3 @@
 #include "status/PlayerData.h"
 
-status::PlayerData status::PlayerDataAll::playerData_[64] = {};
+status::PlayerData status::PlayerDataAll::playerData_[232] = {};

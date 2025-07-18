@@ -4,6 +4,6 @@
 namespace status {
     struct PlayerData;
     struct PlayerDataAll {
-        static PlayerData playerData_[64];
+        static PlayerData playerData_[232];
     };
 }

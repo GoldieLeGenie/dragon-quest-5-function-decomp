@@ -5,14 +5,16 @@
 #include "status/HaveBattleStatus.h"
 #include "dq5/ActionParam.h"
 #include "dq5/CharacterType.h"
+#include "dq5/MonsterData.h"
 #include "dq5/CommandType.h"
 #include "dq5/dq5sex.h"
 #include "dq5/CharacterData.h"
 #include "dq5/PlayerData1.h"
+#include "status/PlayerData.h"
 #include "ar/rand.h"
 
 
-bool status::HaveStatus::seinenki_ = false;
+char status::HaveStatus::seinenki_;
 
 uint16_t status::HaveStatus::getHp(const HaveStatus* self) {
     uint16_t hp = self->baseStatus_.hp_;
@@ -238,4 +240,514 @@ void status::HaveStatus::setExp(HaveStatus* self, int exp) {
 }
 
 
+void status::HaveStatus::addBaseHp(HaveStatus* self, int hp) {
+    int hpMax = self->baseStatus_.hpMax_;
+    int sum = self->baseStatus_.hp_ + hp;
 
+    int clamped = sum & ~(sum >> 31);
+
+    if (clamped < hpMax)
+        hpMax = clamped;
+
+    self->baseStatus_.hp_ = hpMax;
+}
+
+void status::HaveStatus::setup(HaveStatus* self, uint16_t index, bool flag)
+{
+    if (flag)
+        status::HaveStatus::setupPlayer(self, index);
+    else
+        status::HaveStatus::setupMonster(self, index, 1);
+}
+
+void status::HaveStatus::setupPlayer(status::HaveStatus* self, uint16_t index) {
+    char* rawData = reinterpret_cast<char*>(&status::PlayerDataAll::playerData_);
+    status::PlayerData* player = reinterpret_cast<status::PlayerData*>(rawData + 276 * index);
+
+    self->playerIndex_ = index;
+    self->playerKindIndex_ = player->kindIndex_;
+
+    self->baseStatus_.strength_ = static_cast<uint8_t>(player->baseStatus_.strength_);
+    self->baseStatus_.agility_ = player->baseStatus_.agility_;
+    self->baseStatus_.protection_ = static_cast<uint8_t>(player->baseStatus_.protection_);
+    self->baseStatus_.wisdom_ = player->baseStatus_.wisdom_;
+    self->baseStatus_.luck_ = player->baseStatus_.luck_;
+    self->baseStatus_.hp_ = player->baseStatus_.hp_;
+    self->baseStatus_.hpMax_ = player->baseStatus_.hpMax_;
+    self->baseStatus_.mp_ = player->baseStatus_.mp_;
+    self->baseStatus_.mpMax_ = player->baseStatus_.mpMax_;
+
+    self->charaIndex_ = status::PlayerData::getCgIndex(player);
+    self->monsterIndex_ = status::PlayerData::getActionMonsterIndex(player);
+    self->iconIndex_ = status::PlayerData::getIconIndex(player);
+    self->equipAttrIndex_ = status::PlayerData::getEquipAttrIndex(player);
+
+    self->exp_ = player->baseStatus_.exp_;
+    self->level_ = player->baseStatus_.level_;
+    self->levelMax_ = status::PlayerData::getLevelMax(player);
+    self->jobId_ = status::PlayerData::getJob(player);
+    self->monsterId_ = status::PlayerData::getMonsterIndex(player);
+    self->sexId_ = status::PlayerData::getSexId(player);
+    self->command_ = player->command_;
+    self->actionCursorIndex_ = player->actionCursorIndex_;
+
+    // Si le niveau actuel est inférieur au max, on récupère l'exp du prochain niveau
+    if (self->level_ < self->levelMax_) {
+        int kind = self->playerKindIndex_;
+        dq5::level::PlayerData1* record = nullptr;
+
+        if (kind != 15 && kind != 8) {
+            if (kind == 7)
+                kind = 6;
+            record = dq5::level::CharacterData::getRecord(kind, self->level_ + 1);
+        }
+
+        if (record)
+            self->baseStatus_.exp_ = record->exp;
+    }
+
+    // Détermination du type de personnage
+    switch (status::PlayerData::getCharacterKind(player)) {
+    case 1: self->playerType_ = 1; break;
+    case 2: self->playerType_ = 2; break;
+    case 3: self->playerType_ = 3; break;
+    case 4:
+        self->playerType_ = 4;
+        [[fallthrough]];
+    case 5: self->playerType_ = 5; break;
+    default:
+        if (self->playerType_ == 4) {
+            *reinterpret_cast<uint32_t*>(&self->baseStatus_.hp_) = 0x000A000A;
+        }
+        break;
+    }
+}
+
+void status::HaveStatus::setupMonster(HaveStatus* self, uint16_t index, bool flag) {
+    uint16_t* record = reinterpret_cast<uint16_t*>(dq5::level::MonsterData::binary_.getRecord(
+        index,
+        dq5::level::MonsterData::addr_,
+        dq5::level::MonsterData::filename_[0],
+        static_cast<ar::File::LoadSwitch>(dq5::level::MonsterData::loadSwitch_))
+        );
+    
+
+    self->baseStatus_.strength_ = record[3];
+    self->baseStatus_.agility_ = *(reinterpret_cast<uint8_t*>(record) + 31);
+    self->baseStatus_.protection_ = record[4];
+    self->baseStatus_.wisdom_ = 0;
+
+    uint16_t hpMax = record[1];
+    self->baseStatus_.hpMax_ = hpMax;
+    self->baseStatus_.hp_ = hpMax;
+
+    int mpMax = record[2];
+    self->baseStatus_.mpMax_ = mpMax;
+    self->baseStatus_.mp_ = mpMax;
+
+    if (mpMax == 255) {
+        *reinterpret_cast<uint32_t*>(&self->baseStatus_.mp_) = 65537000;
+    }
+
+    if (flag) {
+        self->playerKindIndex_ = index;
+        self->playerIndex_ = index;
+        self->charaIndex_ = 0;
+        self->iconIndex_ = 0;
+        self->exp_ = record[6];
+        self->gold_ = record[5];
+        self->playerType_ = 6;
+        self->isMonster_ = false;
+        self->isPlayer_ = false;
+    }
+}
+
+
+void status::HaveStatus::copyHaveStatus(HaveStatus* self, HaveStatus* rhs) {
+    // Copie directe des membres du sous-struct baseStatus_
+    self->baseStatus_.strength_ = rhs->baseStatus_.strength_;
+    self->baseStatus_.agility_ = rhs->baseStatus_.agility_;
+    self->baseStatus_.wisdom_ = rhs->baseStatus_.wisdom_;
+    self->baseStatus_.hp_ = rhs->baseStatus_.hp_;
+    self->baseStatus_.mp_ = rhs->baseStatus_.mp_;
+    self->baseStatus_.exp_ = rhs->baseStatus_.exp_;
+
+    // Copie des autres membres
+    self->exp_ = rhs->exp_;
+    self->gold_ = rhs->gold_;
+    self->level_ = rhs->level_;
+    self->levelMax_ = rhs->levelMax_;
+}
+
+
+void status::HaveStatus::print(HaveStatus* self)
+{
+    
+}
+
+uint16_t status::HaveStatus::getDefence(const HaveStatus* self){
+    uint32_t  protection; 
+    uint16_t  maxdef;
+
+    protection = self->baseStatus_.protection_;
+    maxdef = 9999;
+    if (protection < 9999)
+        return protection;
+    return maxdef;
+}
+
+uint16_t status::HaveStatus::getAttack(const HaveStatus* self)
+{
+    uint32_t strength;
+    uint16_t maxatk; 
+
+    strength = self->baseStatus_.strength_;
+    maxatk = 9999;
+    if (strength < 9999)
+        return strength;
+    return maxatk;
+}
+
+void status::HaveStatus::addMpMax(status::HaveStatus* self, char mp)
+{
+    status::BaseStatus::addMpMax(&self->baseStatus_, mp);
+}
+
+
+void status::HaveStatus::setLevelupExp(HaveStatus* self, int val)
+{
+    self->baseStatus_.exp_ = self->exp_ + val;
+}
+
+
+void status::HaveStatus::addExp(HaveStatus* self, int exp) {
+    int currentExp = self->exp_;
+
+    if (currentExp != -1) {
+        int newExp = currentExp + exp;
+
+        int clampedExp = newExp & ~(newExp >> 31);
+
+        if (clampedExp > 0xFFFFFF) {
+            clampedExp = 0xFFFFFF;
+        }
+
+        self->exp_ = clampedExp;
+    }
+}
+
+
+
+int status::HaveStatus::getIconIndex(const status::HaveStatus* self) {
+    if (self->playerIndex_ != 1) {
+        return self->iconIndex_;
+    }
+    if (!status::HaveStatus::seinenki_) {
+        return self->iconIndex_;
+    }
+    return 2;
+}
+
+
+uint16_t status::HaveStatus::levelupAjust(HaveStatus* self, uint16_t value, uint16_t diff, uint16_t normal) {
+    // Constante hex pour division rapide, multipliée par (75 * normal)
+    int64_t multiplier = 0x51EB851FLL;
+    int64_t mul_result = multiplier * static_cast<int64_t>(75) * static_cast<int64_t>(normal);
+
+    uint32_t limit = (150 * normal) / 100;
+
+    if (limit >= value && (diff + value) <= limit) {
+        uint32_t high = static_cast<uint32_t>(mul_result >> 32);
+        uint32_t shifted = high >> 5;
+
+        uint32_t low = static_cast<uint32_t>(mul_result);
+        if (low < shifted) {
+            // Remplace la partie basse par shifted (shifted <= 32 bits)
+            mul_result = (mul_result & 0xFFFFFFFF00000000LL) | shifted;
+        }
+        return static_cast<uint16_t>(mul_result);
+    }
+    else {
+        return static_cast<uint16_t>(ar::rand(2) + value);
+    }
+}
+
+uint16_t status::HaveStatus::levelupAjustSpecial(HaveStatus* self,uint16_t value,uint16_t diff,uint16_t normal)
+{
+    uint32_t currentValue = value;
+
+    constexpr int64_t multiplier = 0x51EB851FLL;
+
+    int64_t mulResult = multiplier * static_cast<int64_t>(130 * normal);
+
+    int limit86Percent = static_cast<int>(86 * normal / 100);
+
+    int normalMinus30 = static_cast<int16_t>(normal - 30);
+
+    int clampedNormalMinus30 = normalMinus30 & ~(normalMinus30 >> 31);
+    int clampedLimit86Percent = limit86Percent & ~(limit86Percent >> 31);
+
+    
+    const int maxLimit = 1000;
+    if (clampedNormalMinus30 > maxLimit)
+        clampedNormalMinus30 = maxLimit;
+    if (clampedLimit86Percent < maxLimit)
+        clampedNormalMinus30 = (clampedNormalMinus30 > clampedLimit86Percent) ? clampedNormalMinus30 : clampedLimit86Percent;
+
+    uint32_t mulResultHigh = static_cast<uint32_t>(mulResult >> 32);
+
+    int adjustedHigh = (mulResultHigh >> 5) + 15;
+
+    uint16_t normalPlus60 = normal + 60;
+    uint16_t finalLimit = (adjustedHigh < normalPlus60) ? adjustedHigh : normalPlus60;
+
+    if (finalLimit >= currentValue && (diff + currentValue) <= finalLimit) {
+        int proposedValue = diff + currentValue;
+        if (proposedValue < clampedNormalMinus30) {
+            return static_cast<uint16_t>(clampedNormalMinus30);
+        }
+        return static_cast<uint16_t>(proposedValue);
+    }
+    else {
+        return static_cast<uint16_t>(ar::rand(2) + currentValue);
+    }
+}
+
+uint16_t status::HaveStatus::levelupAdd(HaveStatus* self, uint16_t value) {
+    uint16_t randPart = static_cast<uint16_t>(ar::rand(50) + 75);
+    int64_t mulResult = 1374389535LL * static_cast<uint16_t>(randPart * value + 50);
+
+    uint32_t highShifted = (static_cast<uint32_t>(mulResult >> 32)) >> 5;
+
+    if (value <= highShifted) {
+        return static_cast<uint16_t>(highShifted);
+    }
+    return value;
+}
+
+
+void status::HaveStatus::levelup(status::HaveStatus* self, bool flag)
+{
+    if (self->level_ < self->levelMax_)
+    {
+        self->level_++;
+
+        if (flag)
+            self->exp_ = self->baseStatus_.exp_;
+
+        status::BaseStatus diffStats;  
+
+        int playerKindIndex = self->playerKindIndex_;
+        unsigned int level = self->level_;
+
+        
+        dq5::level::PlayerData1* record = nullptr;
+        if (playerKindIndex != 15 && playerKindIndex != 8)
+        {
+            if (playerKindIndex == 7)
+                playerKindIndex = 6;
+
+            record = dq5::level::CharacterData::getRecord(playerKindIndex, level - 1);
+        }
+
+        
+        auto vitality = record ? record->vitality : 0;
+        auto MP = record ? record->MP : 0;
+        auto luck = record ? record->luck : 0;
+        auto intelligence = record ? record->intelligence : 0;
+        auto agility = record ? record->agility : 0;
+        auto HP = record ? record->HP : 0;
+        auto strength = record ? record->strength : 0;
+
+        dq5::level::PlayerData1* nextRecord = nullptr;
+        if (playerKindIndex != 15 && playerKindIndex != 8)
+        {
+            if (playerKindIndex == 7)
+                playerKindIndex = 6;
+
+            nextRecord = dq5::level::CharacterData::getRecord(playerKindIndex, level);
+        }
+
+        if (nextRecord)
+        {
+            diffStats.agility_ = nextRecord->agility - agility;
+            diffStats.wisdom_ = nextRecord->intelligence - intelligence;
+            diffStats.luck_ = nextRecord->luck - luck;
+            diffStats.protection_ = nextRecord->vitality - vitality;  
+            diffStats.hpMax_ = static_cast<uint8_t>(nextRecord->HP - HP);
+            diffStats.mpMax_ = static_cast<uint8_t>(nextRecord->MP - MP);
+            diffStats.strength_ = static_cast<uint8_t>(nextRecord->strength - strength);
+        }
+        else
+        {
+            memset(&diffStats, 0, sizeof(diffStats));
+        }
+
+        if (level < self->levelMax_)
+        {
+            int nextLevelIndex = level + 1;
+            int pkIndex = self->playerKindIndex_;
+            if (pkIndex == 7)
+                pkIndex = 6;
+
+            auto nextNextRecord = dq5::level::CharacterData::getRecord(pkIndex, nextLevelIndex);
+            if (nextNextRecord)
+            {
+                self->baseStatus_.exp_ = nextNextRecord->exp; 
+            }
+        }
+
+        self->baseStatus_.strength_ = status::HaveStatus::levelupAjustSpecial(self, self->baseStatus_.strength_, diffStats.strength_, nextRecord ? nextRecord->strength : 0);
+        self->baseStatus_.agility_ = status::HaveStatus::levelupAjust(self, self->baseStatus_.agility_, diffStats.agility_, nextRecord ? nextRecord->agility : 0);
+        self->baseStatus_.protection_ = status::HaveStatus::levelupAjust(self, self->baseStatus_.protection_, diffStats.protection_, vitality);
+        self->baseStatus_.wisdom_ = status::HaveStatus::levelupAjust(self, self->baseStatus_.wisdom_, diffStats.wisdom_, intelligence);
+        self->baseStatus_.luck_ = status::HaveStatus::levelupAjust(self, self->baseStatus_.luck_, diffStats.luck_, luck);
+        self->baseStatus_.hpMax_ = status::HaveStatus::levelupAjustSpecial(self, self->baseStatus_.hpMax_, diffStats.hpMax_, HP);
+        self->baseStatus_.mpMax_ = status::HaveStatus::levelupAjust(self, self->baseStatus_.mpMax_, diffStats.mpMax_, MP);
+
+        if (flag)
+        {
+            self->baseStatus_.hp_ = self->baseStatus_.hpMax_;
+            self->baseStatus_.mp_ = self->baseStatus_.mpMax_;
+        }
+
+    }
+}
+
+
+
+void status::HaveStatus::debugLevelup(status::HaveStatus* self, int level)
+{
+    int levelMax = self->levelMax_;
+    if (levelMax == 0)
+        return;
+
+    int cappedLevel = levelMax;
+    if (level < levelMax)
+        cappedLevel = level;
+
+    int playerKindIndex = self->playerKindIndex_;
+    dq5::level::PlayerData1* Record = nullptr;
+
+    bool isSpecialKind = (playerKindIndex == 15 || playerKindIndex == 8);
+    if (!isSpecialKind)
+    {
+        if (playerKindIndex == 7)
+            playerKindIndex = 6;
+
+        Record = dq5::level::CharacterData::getRecord(playerKindIndex, cappedLevel);
+        levelMax = self->levelMax_;
+    }
+
+    if (Record)
+    {
+        int exp = Record->exp;
+        uint16_t MP = Record->MP;
+        uint16_t HP = Record->HP;
+        uint16_t luck = Record->luck;
+        uint16_t intelligence = Record->intelligence;
+        uint16_t vitality_low = Record->vitality;
+        uint16_t strength_low = Record->strength;
+
+        self->baseStatus_.agility_ = Record->agility;
+        self->baseStatus_.strength_ = strength_low;
+        self->baseStatus_.protection_ = vitality_low;
+        self->baseStatus_.wisdom_ = intelligence;
+        self->baseStatus_.luck_ = luck;
+        self->baseStatus_.hp_ = HP;
+        self->baseStatus_.hpMax_ = HP;
+        self->baseStatus_.mp_ = MP;
+        self->baseStatus_.mpMax_ = MP;
+        self->level_ = cappedLevel;
+        self->exp_ = exp;
+
+        if (cappedLevel < levelMax)
+        {
+            int nextPlayerKindIndex = self->playerKindIndex_;
+            dq5::level::PlayerData1* nextRecord = nullptr;
+            bool nextIsSpecial = (nextPlayerKindIndex == 15 || nextPlayerKindIndex == 8);
+
+            if (!nextIsSpecial)
+            {
+                if (nextPlayerKindIndex == 7)
+                    nextPlayerKindIndex = 6;
+
+                nextRecord = dq5::level::CharacterData::getRecord(nextPlayerKindIndex, cappedLevel + 1);
+            }
+
+            if (nextRecord)
+                self->baseStatus_.exp_ = nextRecord->exp;
+        }
+    }
+}
+
+
+bool status::HaveStatus::isLevelup(HaveStatus* self)
+{
+    bool canLevelUp = false;
+    uint32_t  playerType = static_cast<uint8_t>(self->playerType_);
+    bool isBlocked;
+
+    if (playerType <= 5)
+    {
+        isBlocked = ((1 << playerType) & 0x26) == 0;
+        if (((1 << playerType) & 0x26) != 0)
+            isBlocked = self->level_ == self->levelMax_;
+        if (!isBlocked)
+            return self->exp_ >= self->baseStatus_.exp_;
+    }
+    return canLevelUp;
+}
+
+void status::HaveStatus::resetExpGold(HaveStatus* self)
+{
+    uint16_t* record = reinterpret_cast<uint16_t*>(dq5::level::MonsterData::binary_.getRecord(
+        self->playerIndex_,
+        dq5::level::MonsterData::addr_,
+        dq5::level::MonsterData::filename_[0],
+        static_cast<ar::File::LoadSwitch>(dq5::level::MonsterData::loadSwitch_))
+        );
+
+    self->exp_ = record[6];
+    self->gold_ = record[5];
+}
+
+void status::HaveStatus::cleanupPlayer(HaveStatus* self)
+{
+    char* playerDataBase = reinterpret_cast<char*>(&status::PlayerDataAll::playerData_);
+    char* playerDataPtr = playerDataBase + 276 * self->playerIndex_;
+
+    status::BaseStatus* baseStatusPtr = reinterpret_cast<status::BaseStatus*>(playerDataPtr);
+
+    status::BaseStatus::setStrength(baseStatusPtr + 2, self->baseStatus_.strength_);
+    status::BaseStatus::setAgility(baseStatusPtr + 2, self->baseStatus_.agility_);
+    status::BaseStatus::setProtection(baseStatusPtr + 2, self->baseStatus_.protection_);
+    status::BaseStatus::setWisdom(baseStatusPtr + 2, self->baseStatus_.wisdom_);
+    status::BaseStatus::setLuck(baseStatusPtr + 2, self->baseStatus_.luck_);
+    status::BaseStatus::setHp(baseStatusPtr + 2, self->baseStatus_.hp_);
+    status::BaseStatus::setHpMax(baseStatusPtr + 2, self->baseStatus_.hpMax_);
+    status::BaseStatus::setMp(baseStatusPtr + 2, self->baseStatus_.mp_);
+    status::BaseStatus::setMpMax(baseStatusPtr + 2, self->baseStatus_.mpMax_);
+
+    (baseStatusPtr + 2)->exp_ = self->exp_;
+    (baseStatusPtr + 2)->level_ = self->level_;
+    (baseStatusPtr + 1)->agility_ = self->command_;
+    (baseStatusPtr + 1)->wisdom_ = self->actionCursorIndex_;
+}
+
+void status::HaveStatus::cleanup(HaveStatus* self)
+{
+    if (self->playerType_ != 6)
+        status::HaveStatus::cleanupPlayer(self);
+}
+
+status::HaveStatus::~HaveStatus()
+{
+    this->baseStatus_.~BaseStatus();
+
+}
+
+status::HaveStatus::HaveStatus()
+{
+    this->baseStatus_ = BaseStatus(); 
+}

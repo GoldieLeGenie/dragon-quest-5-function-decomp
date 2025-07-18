@@ -33,13 +33,24 @@
 #include "args/PlacementParameter.h"
 #include "args/PlacementParameterParam.h"
 #include "args/DataObject.h"
-
+#include "status/getRandomVariation.h"
+#include "dq5/CharacterType.h"
+#include "status/getUsuallyAttackEffectValueForAI.h"
 
 
 int main() {
-    std::cout << "DQ5 remake running!" << std::endl;
+    status::HaveStatusInfo_0 statusInfo{};
+
+    status::HaveStatusInfo::setAttack(&statusInfo, 42);
+    status::HaveStatusInfo::setDefence(&statusInfo, 42);
+
+
+    std::cout << "Attack set to: " << statusInfo.haveStatus_.baseStatus_.strength_ << std::endl;
+    std::cout << "protection set to: " << statusInfo.haveStatus_.baseStatus_.protection_<< std::endl;
+
     return 0;
 }
+
 
 // Simule une initialisation de ActionParam
 //void initActionParam() {

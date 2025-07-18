@@ -1,13 +1,11 @@
 ﻿#pragma once
 
 #include <cstdint>
-#include "ar/BitFlag.h" // ar::Flag32 est supposé être BitFlag<uint32_t>
-
-#pragma pack(push, 4)
+#include "ar/BitFlag.h" 
 
 namespace status {
 
-    struct alignas(4) StageAttribute {
+    struct StageAttribute {
         ar::Flag32 flag_;                 // 0x00
         char mapName_[32];                // 0x04
         int32_t floorIndex_;              // 0x24
@@ -26,12 +24,10 @@ namespace status {
         int32_t furnitureIndex_;          // 0xA8
         bool timestop_;                   // 0xAC
        
-        // Méthodes membres (déclarations uniquement ici)
         static bool isCarriageEnable(const StageAttribute* self);
         static bool isCarriageEnter(const StageAttribute* self);
         static const char* getMapName(const StageAttribute*);
     };
     extern StageAttribute* g_StageAttribute;
-} // namespace status
+} 
 
-#pragma pack(pop)

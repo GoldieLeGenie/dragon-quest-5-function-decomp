@@ -9,8 +9,6 @@ namespace status {
     struct BaseHaveItem {
         ~BaseHaveItem();
         BaseHaveItem& operator=(const BaseHaveItem& rhs);
-
-        int (**_vptr$BaseHaveItem)(void);  // 0x00 (8 bytes on x64)
         ItemData* item_;      // 0x08 (8 bytes on x64)
         int itemMax_;         // 0x10 (4 bytes)
 
@@ -38,6 +36,7 @@ namespace status {
         static void setSpell(BaseHaveItem* self,int index, bool flag);
         static bool isSpell(BaseHaveItem* self,int index);
         static int addOne(BaseHaveItem* self, int itemIndex);
+        static void execThrow(int index, BaseHaveItem* haveItem);
     };
 
     

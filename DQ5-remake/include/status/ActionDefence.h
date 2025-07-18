@@ -51,6 +51,8 @@ namespace status {
         uint8_t embrace_;           // 0x28
        
         static void initActionDefence(ActionDefence* self);
+        static void setup(ActionDefence* self, uint16_t index, dq5::level::CharacterType type);
+        static void setupMonster(ActionDefence* self, uint16_t index);
         // Taille totale : 0x2C
     };
 

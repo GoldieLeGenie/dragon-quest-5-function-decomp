@@ -1,5 +1,5 @@
 ﻿#include "status/BaseStatus.h"
-
+#include "iostream"
 
 void status::BaseStatus::setHpMax(BaseStatus* self,uint16_t hp) {
     uint16_t maxAllowed = 9999;
@@ -84,4 +84,73 @@ void status::BaseStatus::addHpMax(BaseStatus* self, char hp) {
         sum = 9999;
 
     self->hpMax_ = static_cast<uint16_t>(sum);
+}
+
+void status::BaseStatus::clear(BaseStatus* self) {
+    std::memset(self, 0, 0x13); 
+}
+
+
+void status::BaseStatus::setStrength(BaseStatus* self, uint8_t  str)
+{
+    self->strength_ = str;
+}
+
+void status::BaseStatus::setWisdom(BaseStatus* self, uint8_t wis)
+{
+    self->wisdom_ = wis;
+}
+
+void status::BaseStatus::setProtection(BaseStatus* self, uint8_t pr)
+{
+    self->protection_ = pr;
+}
+
+void status::BaseStatus::setMp(BaseStatus* self, uint16_t mp) {
+    uint16_t maxMP = 999;
+    if (mp < 999)
+        maxMP = mp;
+    self->mp_ = maxMP;
+}
+
+
+void status::BaseStatus::setLuck(BaseStatus* self, uint8_t luck)
+{
+    self->luck_ = luck;
+}
+
+void status::BaseStatus::setHp(BaseStatus* self, uint16_t hp)
+{
+    uint16_t maxAllowedHp = 9999;
+    if (hp < maxAllowedHp)
+        maxAllowedHp = hp;
+    self->hp_ = maxAllowedHp;
+}
+
+void status::BaseStatus::setAgility(BaseStatus* self, uint8_t agi)
+{
+    self->agility_ = agi;
+}
+
+void status::BaseStatus::addMpMax(BaseStatus* self,int8_t mp) {
+    int result = static_cast<int>(self->mpMax_) + mp;
+
+    if (result < 0) result = 0;
+    if (result > 999) result = 999;
+
+    self->mpMax_ = static_cast<uint16_t>(result);
+}
+
+
+void status::BaseStatus::addLuck(BaseStatus* self, uint8_t lc) {
+    int result = static_cast<int>(self->luck_) + lc;
+
+    if (result > 255) result = 255;
+
+    self->luck_ = static_cast<uint8_t>(result);
+}
+
+
+status::BaseStatus::~BaseStatus() {
+    
 }

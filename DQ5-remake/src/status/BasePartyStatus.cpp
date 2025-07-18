@@ -3,10 +3,7 @@
 #include "status/StageAttribute.h"
 #include "status/UseActionFlag.h"
 
-
-
-
-
+status::StageAttribute* status::g_StageAttribute;
 
 void status::BasePartyStatus::setGold(BasePartyStatus * self,uint32_t gold) {
     self->gold_ = gold;
@@ -35,8 +32,8 @@ void status::BasePartyStatus::addMedalCoin(BasePartyStatus* self, int coin) {
 
 bool status::BasePartyStatus::isCarriageEnter(BasePartyStatus* self) {
     return self->carriage_
-        && status::StageAttribute::isCarriageEnable((const StageAttribute*)&status::g_StageAttribute)
-        && status::StageAttribute::isCarriageEnter((const StageAttribute*)&status::g_StageAttribute);
+        && status::StageAttribute::isCarriageEnable(status::g_StageAttribute)
+        && status::StageAttribute::isCarriageEnter(status::g_StageAttribute);
 }
 
 
@@ -49,7 +46,7 @@ status::BasePartyStatus::BasePartyStatus(BasePartyStatus* self) {
 
     self->bashaEnable_ = true;
 
-    self->haveItemSack_ = status::HaveItemSack();
+    status::HaveItemSack::HaveItemSack(self->haveItemSack_);
 }
 
 int status::BasePartyStatus::getBattleExp(BasePartyStatus* self) {
@@ -83,4 +80,22 @@ void status::BasePartyStatus::addBankMoney(BasePartyStatus* self,uint32_t money)
         self->bankMoney_ = v2;
     else
         self->bankMoney_ = v3;
+}
+
+int status::BasePartyStatus::getPlayerFlag(BasePartyStatus* self, int playerIndex)
+{
+    return 0;
+}
+
+bool status::BasePartyStatus::isCarriageEnableOnGame(BasePartyStatus* self)
+{
+    return self->carriage_
+        && status::StageAttribute::isCarriageEnable(status::g_StageAttribute)
+        && status::BasePartyStatus::isCarriageEnter(self);
+}
+
+bool status::BasePartyStatus::isCarriageEnable(BasePartyStatus* self)
+{
+    return self->carriage_
+        && status::StageAttribute::isCarriageEnable(status::g_StageAttribute);
 }

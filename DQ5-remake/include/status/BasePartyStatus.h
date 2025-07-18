@@ -37,6 +37,9 @@ namespace status {
         static void addBankMoney(BasePartyStatus* self, uint32_t money);
         static void addCasinoCoin(BasePartyStatus* self, int coin);
         BasePartyStatus(BasePartyStatus* self);
+        static int getPlayerFlag(BasePartyStatus* self, int playerIndex);
+        static bool isCarriageEnableOnGame(BasePartyStatus* self);
+        static bool isCarriageEnable(BasePartyStatus* self);
     };
 
 } 

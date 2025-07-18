@@ -25,7 +25,7 @@ void* args::ExcelBinaryData::setup() {
 
 
 void args::ExcelBinaryData::setup(uint32_t allocsize) {
-    current_ = static_cast<uint32_t>(-1);  // ou 0xFFFFFFFF
+    current_ = static_cast<uint32_t>(-1);  
 
     uint32_t total = size_ * cash_;
     if (total > allocsize && size_ != 0) {
@@ -38,7 +38,7 @@ void args::ExcelBinaryData::readRecord(
     const char* fname,
     uint32_t seek,
     uint32_t cashsize,
-    ar::File::LoadSwitch /*loadSwitch*/)
+    ar::File::LoadSwitch )
 {
     if (seek + cashsize >= record_) {
         seek = record_ > cashsize ? record_ - cashsize : 0;
@@ -114,7 +114,7 @@ void args::ExcelBinaryData::cleanup(void* addr) {
     FreeFileMemory_0(addr);
 }
 
-void* args::ExcelBinaryData::checkSum(void* addr, int /*id*/) {
+void* args::ExcelBinaryData::checkSum(void* addr, int id) {
     return static_cast<char*>(addr) + 4;
 }
 

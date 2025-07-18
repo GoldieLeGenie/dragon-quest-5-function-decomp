@@ -125,3 +125,25 @@ void status::HaveEquipment::resetEquipment(HaveEquipment* self, int itemIndex)
 {
    
 }
+
+void status::HaveEquipment::clear(HaveEquipment* self) {
+    self->luck_ = 0;
+    self->strength_ = 0;
+    self->attack_ = 0;
+}
+
+
+void status::HaveEquipment::setup(HaveEquipment* self, HaveItem* haveItem)
+{
+    self->haveItem_ = haveItem;
+    self->calcNoEquipmentItemIndex_ = 0;
+    self->calcEquipmentItemIndex_ = 0;
+}
+
+void status::HaveEquipment::setup(HaveEquipment* self, int index)
+{
+    self->luck_ = 0;
+    *&self->strength_ = 0;
+    *&self->attack_ = 0;
+    self->playerIndex_ = index;
+}

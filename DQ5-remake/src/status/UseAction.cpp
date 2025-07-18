@@ -933,5 +933,5 @@ void status::UseAction::execUse(UseActionParam* useActionParam) {
 
     bool isBattleMode = HaveAction::isBattleMode();
 
-    /*status::BaseAction::exec(useActionParam, isBattleMode);*/
+    /* need to do status::BaseAction::exec(useActionParam, isBattleMode);*/
 }

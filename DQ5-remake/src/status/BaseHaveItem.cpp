@@ -130,8 +130,15 @@ status::BaseHaveItem& status::BaseHaveItem::operator=(const BaseHaveItem& rhs) {
     return *this;
 }
 
-bool status::BaseHaveItem::delOne(BaseHaveItem* self, int ctrlId) {
-    return status::BaseHaveItem::del(self,ctrlId);
+bool status::BaseHaveItem::delOne(status::BaseHaveItem* self, int ctrlId)
+{
+    if (!self || !self->item_ || ctrlId < 0 || ctrlId >= self->itemMax_)
+        return false;
+
+    self->item_[ctrlId] = ItemData();
+    status::BaseHaveItem::sort(self);
+    return true;
+
 }
 
 bool status::BaseHaveItem::isEquipment(const BaseHaveItem* self,int index){
@@ -195,9 +202,14 @@ status::ItemData* status::BaseHaveItem::getItemData(BaseHaveItem* self,int index
 }
 
 status::BaseHaveItem::BaseHaveItem(ItemData* itemData, int itemMax)
-    : item_(itemData), itemMax_(itemMax) {
-    for (int i = 0; i < itemMax_; ++i)
-        item_[i] = ItemData();
+    : item_(itemData), itemMax_(itemMax)
+{
+    if (itemMax_ >= 1) {
+        item_[0] = ItemData{};     
+        for (int i = 1; i < itemMax_; ++i) {
+            item_[i] = ItemData{}; 
+        }
+    }
 }
 
 void status::BaseHaveItem::clear(BaseHaveItem* self) {
@@ -239,5 +251,10 @@ int status::BaseHaveItem::addOne(BaseHaveItem* self,int itemIndex) {
     }
 
     return 0;
+}
+
+
+void status::BaseHaveItem::execThrow(int index, BaseHaveItem* haveItem) {
+    haveItem->del(haveItem,index);  // appel virtuel réel
 }
 

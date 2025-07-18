@@ -1,8 +1,7 @@
 #pragma once
 
-
 namespace dq5 {
-	enum Sex
+	enum class Sex
 	{
 		SEX_MALE = 0x0,
 		SEX_FEMALE = 0x1,
