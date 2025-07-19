@@ -114,6 +114,10 @@ namespace dq5::level {
             ACTIONTYPE_MSG_FAILED = 0x32,
             ACTIONTYPE_MAX = 0x33
         };
+
+      
+
+     
         unsigned long actionMes;         // 0x00
         unsigned long playerSuccess;     // 0x04
         unsigned long monsterSuccess;    // 0x08

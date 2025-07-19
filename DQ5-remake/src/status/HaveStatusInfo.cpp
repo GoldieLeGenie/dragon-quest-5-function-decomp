@@ -165,7 +165,7 @@ uint16_t status::HaveStatusInfo::getAttack(HaveStatusInfo_0* self, int effect)
 
 
 
-uint16_t status::HaveStatusInfo::getDefence(status::HaveStatusInfo_0* self, int effect)
+uint16_t status::HaveStatusInfo::getDefence(HaveStatusInfo_0* self, int effect)
 {
     if (!self)
         return 0;
@@ -254,7 +254,7 @@ void status::HaveStatusInfo::setMp(HaveStatusInfo_0* self, uint16_t mp) {
 }
 
 
-uint16_t status::HaveStatusInfo::getMp(const status::HaveStatusInfo_0* self) {
+uint16_t status::HaveStatusInfo::getMp(const HaveStatusInfo_0* self) {
     return status::HaveStatus::getMp(&self->haveStatus_);
 }
 
@@ -263,7 +263,9 @@ uint16_t status::HaveStatusInfo::getMp(const status::HaveStatusInfo_0* self) {
 void status::HaveStatusInfo::HaveStatusinfo(HaveStatusInfo_0* self) {
     std::memset(self->status_, 0, sizeof(self->status_));
 
-    status::ActionDefence::initActionDefence(&self->actionDefence_);
+    /*CONSTRUCTOR status::ActionDefence()*/
+    status::ActionDefence v4 = self->actionDefence_;
+
     self->noDamage_ = 0;
     self->defenceChange_ = 0;
     

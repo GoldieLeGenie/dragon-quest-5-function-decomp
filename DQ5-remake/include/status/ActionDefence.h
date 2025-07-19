@@ -1,13 +1,15 @@
 ﻿#pragma once
 #include <cstdint>
 #include "dq5/CharacterType.h"
+#include "dq5/ActionParam.h"
 
 namespace status {
 
-    struct alignas(4) ActionDefence {
-        bool disable_;              // 0x00
+    struct ActionDefence {
+     
+        bool disable_;             
        
-        dq5::level::CharacterType characterType_;  // 0x04
+        dq5::level::CharacterType characterType_;  
 
         // Défenses élémentaires et altérations
         uint8_t mera_;              // 0x08
@@ -47,13 +49,23 @@ namespace status {
         uint8_t success_3_8_;       // 0x26
         uint8_t success_5_8_;       // 0x27
 
-        // Statut divers
-        uint8_t embrace_;           // 0x28
+
+        uint8_t embrace_;      
        
-        static void initActionDefence(ActionDefence* self);
+        
         static void setup(ActionDefence* self, uint16_t index, dq5::level::CharacterType type);
         static void setupMonster(ActionDefence* self, uint16_t index);
-        // Taille totale : 0x2C
+        static int getEffect(ActionDefence* self, dq5::level::ActionParam::DEFENCETYPE type, uint8_t value);
+        static int getEffectAI(ActionDefence* self, dq5::level::ActionParam::DEFENCETYPE type, uint8_t value);
+        static int calc(ActionDefence* self, dq5::level::ActionParam::DEFENCE kind, dq5::level::ActionParam::DEFENCETYPE type, int actionIndex);
+        static int calcAI(ActionDefence* self, dq5::level::ActionParam::DEFENCE kind, dq5::level::ActionParam::DEFENCETYPE type, int actionIndex);
+        static int getEffectValue(ActionDefence* self, int actionIndex);
+        static int getEffectValueAI(ActionDefence* self, int actionIndex);
+        static void clear(ActionDefence* self);
+        static void setupPlayer(ActionDefence* self, uint16_t  index);
+        static void print(ActionDefence* self);
+        ActionDefence();
+        ~ActionDefence();
     };
 
-} // namespace status
+} 

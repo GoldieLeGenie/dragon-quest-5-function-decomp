@@ -160,7 +160,6 @@ int status::PlayerData::getIconIndex(PlayerData* self) {
     if (self->kindIndex_ == 13)
         return status::HaveStatusInfo::getSonIconIndex();
 
-    // Par défaut, icône à l'offset 79 dans l’enregistrement binaire
     return record[79];
 }
 
