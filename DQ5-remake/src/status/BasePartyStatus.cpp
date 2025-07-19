@@ -71,15 +71,15 @@ void status::BasePartyStatus::reflectBattleGold(BasePartyStatus* self) {
 }
 
 void status::BasePartyStatus::addBankMoney(BasePartyStatus* self,uint32_t money) {
-    uint32_t v2;
-    uint32_t v3;
+    uint32_t AddedMoney;
+    uint32_t MaxMoney;
 
-    v2 = self->bankMoney_ + money;
-    v3 = 999999;
-    if (v2 < v3)
-        self->bankMoney_ = v2;
+    AddedMoney = self->bankMoney_ + money;
+    MaxMoney = 999999;
+    if (AddedMoney < MaxMoney)
+        self->bankMoney_ = AddedMoney;
     else
-        self->bankMoney_ = v3;
+        self->bankMoney_ = MaxMoney;
 }
 
 int status::BasePartyStatus::getPlayerFlag(BasePartyStatus* self, int playerIndex)
