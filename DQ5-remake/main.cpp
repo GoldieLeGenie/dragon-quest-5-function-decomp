@@ -36,19 +36,10 @@
 #include "status/getRandomVariation.h"
 #include "dq5/CharacterType.h"
 #include "status/getUsuallyAttackEffectValueForAI.h"
-
+#include "status/BattleResult.h"
 
 int main() {
-    status::HaveStatusInfo_0 statusInfo{};
 
-    status::HaveStatusInfo::setAttack(&statusInfo, 42);
-    status::HaveStatusInfo::setDefence(&statusInfo, 42);
-
-
-    std::cout << "Attack set to: " << statusInfo.haveStatus_.baseStatus_.strength_ << std::endl;
-    std::cout << "protection set to: " << statusInfo.haveStatus_.baseStatus_.protection_<< std::endl;
-
-    return 0;
 }
 
 

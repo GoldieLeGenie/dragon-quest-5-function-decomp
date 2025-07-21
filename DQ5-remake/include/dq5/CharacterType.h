@@ -1,5 +1,5 @@
 #pragma once
-
+#include <cstdint>
 namespace dq5::level {
 
     enum class CharacterType : int32_t {

@@ -124,11 +124,17 @@ status::BaseHaveItem::BaseHaveItem() : item_(nullptr), itemMax_(0) {}
 status::BaseHaveItem::~BaseHaveItem() {}
 
 status::BaseHaveItem& status::BaseHaveItem::operator=(const BaseHaveItem& rhs) {
-    if (item_ && rhs.item_ && itemMax_ >= 1)
-        for (int i = 0; i < itemMax_; ++i)
-            item_[i] = rhs.item_[i];
+    if (this != &rhs) {
+        itemMax_ = rhs.itemMax_;
+        if (item_ && rhs.item_) {
+            for (int i = 0; i < itemMax_; ++i) {
+                item_[i] = rhs.item_[i];
+            }
+        }
+    }
     return *this;
 }
+
 
 bool status::BaseHaveItem::delOne(status::BaseHaveItem* self, int ctrlId)
 {

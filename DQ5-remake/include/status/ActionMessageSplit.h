@@ -10,7 +10,6 @@ namespace status {
 		static int getMessageRandom(int splitIndex);
 		static int actionIndex_;
 		static int getMessageNoTarget(int splitIndex);
-		static int getMessagePlayerOne(status::CharacterStatus* target, int splitIndex);
 	};
 
 	static int splitMessage_;

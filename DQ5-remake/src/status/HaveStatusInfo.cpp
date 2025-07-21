@@ -228,11 +228,11 @@ bool status::HaveStatusInfo::isMultiAttack(HaveStatusInfo_0* self) {
 
 
 void status::HaveStatusInfo::setMultiAttack(HaveStatusInfo_0* self, bool flag) {
-    constexpr int MULTI_ATTACK_BIT = 10;
+
     if (flag)
-        self->flag_.set(MULTI_ATTACK_BIT);
+        self->flag_.set(10);
     else
-        self->flag_.clear(MULTI_ATTACK_BIT);
+        self->flag_.clear(10);
 }
 
 uint16_t status::HaveStatusInfo::getHpMax(const HaveStatusInfo_0* self) {
@@ -353,7 +353,16 @@ void status::HaveStatusInfo::resetEquipment(HaveStatusInfo_0* self, int index)
     status::BaseHaveItem::resetEquipment(haveItem, index);
 }
 
+void status::HaveStatusInfo::resetEquipment(HaveStatusInfo_0* self, dq5::level::ItemType itemType)
+{
+    status::HaveEquipment* p_haveEquipment; 
+    int Equipment; 
 
+    p_haveEquipment = &self->haveEquipment_;
+    Equipment = status::HaveEquipment::getEquipment(&self->haveEquipment_, itemType, 0);
+    status::HaveEquipment::resetEquipment(p_haveEquipment, Equipment);
+    status::BaseHaveItem::resetEquipmentWithItemIndex(&self->haveItem_, Equipment);
+}
 
 int status::HaveStatusInfo::getDaughterCharaIndex() {
     // Teste si le flag global 0xEB (235) est activé
@@ -496,8 +505,6 @@ uint16_t status::HaveStatusInfo::getStrength(HaveStatusInfo_0* self, int effect)
 
     return strength;
 }
-
-#include <cstdint>
 
 uint8_t status::HaveStatusInfo::getAgility(HaveStatusInfo_0* self, int effect) {
     status::HaveStatus* p_haveStatus = &self->haveStatus_;
@@ -1158,4 +1165,291 @@ void status::HaveStatusInfo::setupStatus(HaveStatusInfo_0* self, int index, bool
         status::HaveStatus::setup(&self->haveStatus_, index, 0);
         status::ActionDefence::setup(&self->actionDefence_, self->index_, dq5::level::CharacterType::MONSTER);
     }
+}
+
+void status::HaveStatusInfo::setExp(HaveStatusInfo_0* self, int exp)
+{
+    status::HaveStatus::setExp(&self->haveStatus_, exp);
+}
+
+void status::HaveStatusInfo::setLevelupExp(HaveStatusInfo_0* self, int val)
+{
+    status::HaveStatus::setLevelupExp(&self->haveStatus_, val);
+}
+
+void status::HaveStatusInfo::setLuck(HaveStatusInfo_0* self, uint8_t  luck)
+{
+   self->haveStatus_.baseStatus_.luck_ = luck;
+}
+
+void status::HaveStatusInfo::rebirth(HaveStatusInfo_0* self)
+{
+    dq5::level::CharacterType characterType;
+  
+    characterType = self->characterType_;
+    uint32_t HpMax = status::HaveStatus::getHpMax(&self->haveStatus_);
+    uint16_t MaxHp = 999;
+    if (HpMax < 0x3E7)
+        MaxHp = HpMax;
+    if (characterType != dq5::level::CharacterType::NONE)
+        MaxHp = HpMax;
+    status::HaveStatusInfo::setHp(self, MaxHp);
+}
+
+
+void status::HaveStatusInfo::setActionDisable(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->battleFlag_.set(8);
+    else
+        self->battleFlag_.clear(8);
+}
+
+void status::HaveStatusInfo::setAddEffectDamage(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->battleFlag_.set(21);
+    else
+        self->battleFlag_.clear(21);
+}
+
+void status::HaveStatusInfo::setAddEffectPoison(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->battleFlag_.set(19);
+    else
+        self->battleFlag_.clear(19);
+}
+
+
+void status::HaveStatusInfo::setAddEffectRecovery(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->battleFlag_.set(20);
+    else
+        self->battleFlag_.clear(20);
+}
+
+void status::HaveStatusInfo::setAddEffectSleep(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->battleFlag_.set(17);
+    else
+        self->battleFlag_.clear(17);
+}
+
+
+
+void status::HaveStatusInfo::setAddEffectSpazz(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->battleFlag_.set(18);
+    else
+        self->battleFlag_.clear(18);
+}
+
+
+void status::HaveStatusInfo::setAddMahotoraExecute(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->battleFlag_.set(31);
+    else
+        self->battleFlag_.clear(31);
+}
+
+void status::HaveStatusInfo::setAgility(HaveStatusInfo_0* self, uint8_t agi)
+{
+    self->haveStatus_.baseStatus_.agility_ = agi;
+}
+
+void status::HaveStatusInfo::setAstoron(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->battleFlag_.set(4);
+    else
+        self->battleFlag_.clear(4);
+}
+
+uint16_t status::HaveStatusInfo::setAttackChange(HaveStatusInfo_0* self)
+{
+    uint16_t result; 
+
+    uint16_t BaseAttack = status::HaveStatusInfo::getBaseAttack(self);
+    uint16_t AtkMax = 0;
+    if (status::HaveStatusInfo::getAttack(self, 0) != 9999)
+    {
+        AtkMax = BaseAttack;
+        if (status::HaveStatusInfo::getAttack(self, 0) + BaseAttack >= 10000)
+            AtkMax = 9999 - status::HaveStatusInfo::getAttack(self, 0);
+    }
+    result = AtkMax;
+    if (!self->attackChange_)
+        self->attackChange_ = AtkMax;
+    return result;
+}
+
+
+uint16_t status::HaveStatusInfo::getBaseAttack(HaveStatusInfo_0* self) {
+    HaveEquipment* p_haveEquipment = &self->haveEquipment_;
+    bool isEquipment = status::HaveEquipment::isEquipment(p_haveEquipment, 66);
+    uint16_t fixedValue = 69;
+
+    if (isEquipment)
+        return fixedValue;
+
+    uint16_t strength = self->haveStatus_.baseStatus_.strength_;
+
+    status::HaveEquipment::calcEffect(p_haveEquipment);
+
+    uint16_t totalStrength = static_cast<uint16_t>(strength + self->haveEquipment_.strength_);
+
+    if (self->characterType_ == dq5::level::CharacterType::PLAYER) {
+        if (totalStrength >= 0xFF) {
+            totalStrength = 0xFF;
+        }
+        totalStrength = static_cast<uint8_t>(totalStrength);
+    }
+
+    uint16_t totalAttack = static_cast<uint16_t>(self->haveEquipment_.attack_ + totalStrength);
+
+    if (totalAttack == 0)
+        return 0;
+
+    if (totalAttack <= 9998)
+        return totalAttack;
+
+    return 9999;
+}
+
+void status::HaveStatusInfo::addExp(HaveStatusInfo_0* self, int exp)
+{
+    status::HaveStatus::addExp(&self->haveStatus_, exp);
+}
+
+
+void status::HaveStatusInfo::addHpInBattle(HaveStatusInfo_0* self,HaveStatusInfo::DiffStatus status,int hp)
+{
+    status::HaveStatusInfo::addHp(self, hp);
+}
+
+void status::HaveStatusInfo::addHpMax(HaveStatusInfo_0* self, uint16_t hp)
+{
+    status::HaveStatus* p_haveStatus; 
+
+    p_haveStatus = &self->haveStatus_;
+    status::HaveStatus::addHpMax(&self->haveStatus_, hp);
+    if (self->characterType_ == dq5::level::CharacterType::PLAYER && status::HaveStatus::getHpMax(p_haveStatus) >= 1000)
+        status::HaveStatus::setHpMax(p_haveStatus, 999);
+}
+
+void status::HaveStatusInfo::addLuck(HaveStatusInfo_0* self, char luck)
+{
+    status::HaveStatus::addLuck(&self->haveStatus_, luck);
+}
+
+void status::HaveStatusInfo::addMp(HaveStatusInfo_0* self, int mp)
+{
+    if (!self->noDamage_)
+        status::HaveStatus::addBaseMp(&self->haveStatus_, mp);
+}
+
+void status::HaveStatusInfo::addMpInBattle(HaveStatusInfo_0* self,HaveStatusInfo::DiffStatus status,int mp)
+{
+    if (!self->noDamage_)
+        status::HaveStatus::addBaseMp(&self->haveStatus_, mp);
+}
+
+void  status::HaveStatusInfo::addMpMax(HaveStatusInfo_0* self, uint16_t mp)
+{
+    status::HaveStatus::addMpMax(&self->haveStatus_, mp);
+}
+
+void  status::HaveStatusInfo::addProtection(HaveStatusInfo_0* self, int pro)
+{
+    status::HaveStatus::addProtection(&self->haveStatus_, pro);
+}
+
+void  status::HaveStatusInfo::addSpecialTargetCount(HaveStatusInfo_0* self)
+{
+    ++self->specialTargetCount_;
+}
+
+void status::HaveStatusInfo::addStrength(HaveStatusInfo_0* self, int str)
+{
+    status::HaveStatus::addStrength(&self->haveStatus_, str);
+}
+
+
+void status::HaveStatusInfo::addWisdom(HaveStatusInfo_0* self, char wis)
+{
+    status::HaveStatus::addWisdom(&self->haveStatus_, wis);
+}
+
+void status::HaveStatusInfo::breakSpell(HaveStatusInfo_0* self)
+{
+    status::StatusChange* p_statusChange; 
+
+    p_statusChange = &self->statusChange_;
+    if (status::StatusChange::isEnable(&self->statusChange_, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CURSE1))
+        status::StatusChange::cleanup(p_statusChange, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CURSE1);
+    if (status::StatusChange::isEnable(p_statusChange, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CURSE2))
+        status::StatusChange::cleanup(p_statusChange, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CURSE2);
+    if (status::StatusChange::isEnable(p_statusChange, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CURSE3))
+        status::StatusChange::cleanup(p_statusChange, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CURSE3);
+    if (status::StatusChange::isEnable(p_statusChange, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CURSE4))
+        status::StatusChange::cleanup(p_statusChange, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CURSE4);
+    if (status::StatusChange::isEnable(p_statusChange, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CURSE5))
+        status::StatusChange::cleanup(p_statusChange, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_CURSE5);
+}
+
+
+void status::HaveStatusInfo::cleanup(HaveStatusInfo_0* self)
+{
+    if (self->characterType_ == dq5::level::CharacterType::PLAYER)
+    {
+        status::HaveStatus::cleanup(&self->haveStatus_);
+        status::HaveItem::cleanup(&self->haveItem_, self->index_);
+        status::HaveAction::cleanup(&self->haveAction_, self->index_);
+        status::StatusChange::store(&self->statusChange_, self->index_);
+    }
+}
+
+
+void status::HaveStatusInfo::clearAgilityChange(HaveStatusInfo_0* self)
+{
+    self->agilityChange_ = 0;
+}
+
+void status::HaveStatusInfo::clearAttackChange(HaveStatusInfo_0* self)
+{
+    self->attackChange_ = 0;
+}
+
+void status::HaveStatusInfo::clearDefenceChange(HaveStatusInfo_0* self)
+{
+    self->defenceChange_ = 0;
+}
+
+
+void status::HaveStatusInfo::detoxPoison(HaveStatusInfo_0* self)
+{
+    status::StatusChange* p_statusChange; 
+
+    p_statusChange = &self->statusChange_;
+    if (status::StatusChange::isEnable(&self->statusChange_, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_DOKU))
+        status::StatusChange::release(p_statusChange, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_DOKU);
+}
+
+
+int16_t status::HaveStatusInfo::getAgilityChange(HaveStatusInfo_0* self)
+{
+    bool isEnable;
+
+    isEnable = status::StatusChange::isEnable(
+        &self->statusChange_,
+        dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_SPD_PLUS);
+   
+    if (isEnable)
+        return self->agilityChange_;
+    return 0;
 }

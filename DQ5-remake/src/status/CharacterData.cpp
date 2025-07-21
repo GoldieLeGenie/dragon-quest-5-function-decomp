@@ -29,3 +29,5 @@ dq5::level::PlayerData1* dq5::level::CharacterData::getRecord(int index, int lev
 
     return static_cast<dq5::level::PlayerData1*>(record);
 }
+
+

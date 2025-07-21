@@ -6,7 +6,6 @@
 namespace dq5::level {
 
     struct ActionParam {
-      
         static args::ExcelBinaryData binary_;
         static void* addr_;
         static const char* filename_[];

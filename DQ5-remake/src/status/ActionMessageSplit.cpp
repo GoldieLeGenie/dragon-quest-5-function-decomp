@@ -3,7 +3,7 @@
 #include "ar/rand.h"
 #include "iostream"
 
-int status::splitMessage_ = 0;
+
 char status::ActionMessageSplit::splitFlag_ = 0;
 int status::ActionMessageSplit::actionIndex_ = 0;
 

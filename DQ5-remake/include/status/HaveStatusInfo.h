@@ -15,15 +15,18 @@ namespace status {
     struct HaveBattleStatus;
     struct HaveStatusInfo_0;
 
-    enum class DiffStatus : int32_t {
-        BeforeAction = 0,
-        ExecuteAction = 1,
-        ResultAction = 2,
-        SpecialAction = 3,
-        MaxAction = 4
-    };
+    
 
     struct HaveStatusInfo {
+
+        enum class DiffStatus : int32_t {
+            BeforeAction = 0,
+            ExecuteAction = 1,
+            ResultAction = 2,
+            SpecialAction = 3,
+            MaxAction = 4
+        };
+
         int hp_[4];                          // 0x00
         int mp_[4];                          // 0x10
         ar::Flag32 status_[8];              // 0x20
@@ -162,6 +165,45 @@ namespace status {
         static bool isActionEnableForMacro(HaveStatusInfo_0* self);
         static bool isAttackEnable(HaveStatusInfo_0* self);
         static void setupStatus(HaveStatusInfo_0* self, int index, bool flag);
+        static void setExp(HaveStatusInfo_0* self, int exp);
+        static void setLevelupExp(HaveStatusInfo_0* self, int val);
+        static void setLuck(HaveStatusInfo_0* self, uint8_t  luck);
+        static void rebirth(HaveStatusInfo_0* self);
+        static void resetEquipment(HaveStatusInfo_0* self, dq5::level::ItemType itemType);
+        static void setActionDisable(HaveStatusInfo_0* self, bool flag);
+        static void setAddEffectDamage(HaveStatusInfo_0* self, bool flag);
+        static void setAddEffectPoison(HaveStatusInfo_0* self, bool flag);
+        static void setAddEffectRecovery(HaveStatusInfo_0* self, bool flag);
+        static void setAddEffectSleep(HaveStatusInfo_0* self, bool flag);
+        static void setAddEffectSpazz(HaveStatusInfo_0* self, bool flag);
+        static void setAddMahotoraExecute(HaveStatusInfo_0* self, bool flag);
+        static void setAgility(HaveStatusInfo_0* self, uint8_t agi);
+        static void setAstoron(HaveStatusInfo_0* self, bool flag);
+        static uint16_t setAttackChange(HaveStatusInfo_0* self);
+        static uint16_t getBaseAttack(HaveStatusInfo_0* self);
+        static void addExp(HaveStatusInfo_0* self, int exp);
+        static void addHpInBattle(HaveStatusInfo_0* self, HaveStatusInfo::DiffStatus status, int hp);
+        static void addHpMax(HaveStatusInfo_0* self, uint16_t hp);
+        static void addLuck(HaveStatusInfo_0* self, char luck);
+        static void addMp(HaveStatusInfo_0* self, int mp);
+        static void addMpInBattle(HaveStatusInfo_0* self, HaveStatusInfo::DiffStatus status, int mp);
+        static int16_t getAgilityChange(HaveStatusInfo_0* self);
+        static void detoxPoison(HaveStatusInfo_0* self);
+        static void addMpMax(HaveStatusInfo_0* self, uint16_t mp);
+        static void addProtection(HaveStatusInfo_0* self, int pro);
+        static void addSpecialTargetCount(HaveStatusInfo_0* self);
+        static void addStrength(HaveStatusInfo_0* self, int str);
+        static void addWisdom(HaveStatusInfo_0* self, char wis);
+        static void breakSpell(HaveStatusInfo_0* self);
+        static void cleanup(HaveStatusInfo_0* self);
+        static void clearAgilityChange(HaveStatusInfo_0* self);
+        static void clearAttackChange(HaveStatusInfo_0* self);
+        static void clearDefenceChange(HaveStatusInfo_0* self);
+        
+        
+        
+        
+        
         HaveStatusInfo();
         
 
