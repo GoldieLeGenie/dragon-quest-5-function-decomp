@@ -199,13 +199,19 @@ namespace status {
         static void clearAgilityChange(HaveStatusInfo_0* self);
         static void clearAttackChange(HaveStatusInfo_0* self);
         static void clearDefenceChange(HaveStatusInfo_0* self);
-        
-        
-        
-        
-        
+        static void setMpFailure(HaveStatusInfo_0* self, bool flag);
+        static void setMahotoneFailure(HaveStatusInfo_0* self, bool flag);
+        static void setBaikirutoDisable(HaveStatusInfo_0* self, bool flag);
+        static void setImmidiateDeath(HaveStatusInfo_0* self, bool flag);
+        static void setWeaponAddDamage(HaveStatusInfo_0* self, bool flag);
+        static void setDamageMyself(HaveStatusInfo_0* self, bool flag);
+        static void setCounterDamage(HaveStatusInfo_0* self, bool flag);
+        static bool isTargetJoukForTest(HaveStatusInfo_0* self);
+        static void setKillMyself(HaveStatusInfo_0* self, bool flag);
+        static bool isKillMyself(HaveStatusInfo_0* self);
+        static void setMonsterChange(HaveStatusInfo_0* self, bool flag);
         HaveStatusInfo();
-        
+        ~HaveStatusInfo();
 
         /*void clearStatusChangeInBattle();
         void setStatusChangeInBattle(DiffStatus status);*/ // ✅ retiré le `static`

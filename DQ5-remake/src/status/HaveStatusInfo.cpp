@@ -288,7 +288,7 @@ void status::HaveStatusInfo::setHp(HaveStatusInfo_0* self, uint16_t hp)
     if (!self->noDamage_)
     {
         status::HaveStatus::setHp(&self->haveStatus_, hp);
-       /* status::HaveStatusInfo::execDeath(self);*/
+       /* status::HaveStatusInfo::execDeath(self); NEED TO DO */
     }
 }
 
@@ -627,22 +627,22 @@ status::HaveStatusInfo::HaveStatusInfo() {
     this->battleFlag_.setValue(0);
 
     status::HaveStatus::HaveStatus(this->haveStatus_);
-    //status::HaveItem::HaveItem(&this->haveItem_) need to do;
+    this->haveItem_ = status::HaveItem();
     status::HaveAction::HaveAction(this->haveAction_);
     status::HaveEquipment::HaveEquipment(this->haveEquipment_);
     status::StatusChange::StatusChange(this->statusChange_);
     this->commandTypeDebug_ = dq5::level::CommandTypeDebug::DEFENCE_ONLY;
 }
 
-//status::HaveStatusInfo::~HaveStatusInfo()
-//{
-//    status::StatusChange::~StatusChange(this->statusChange_);
-//    status::HaveEquipment::~HaveEquipment(this->haveEquipment_);
-//    status::HaveAction::~HaveAction(this->haveAction_);
-//    status::HaveItem::~HaveItem(this->haveItem_);
-//    status::HaveStatus::~HaveStatus(this->haveStatus_);
-//    status::ActionDefence::~ActionDefence(this->actionDefence_);
-//}
+status::HaveStatusInfo::~HaveStatusInfo()
+{
+    this->statusChange_.~StatusChange();
+    this->haveEquipment_.~HaveEquipment();
+    this->haveAction_.~HaveAction();
+    this->haveItem_.~HaveItem();
+    this->haveStatus_.~HaveStatus();
+    this->actionDefence_.~ActionDefence();
+}
 
 
 
@@ -1056,7 +1056,7 @@ void status::HaveStatusInfo::setGlbMegazaruRing(bool flag)
 
 int status::HaveStatusInfo::isGlbMegazaruRing()
 {
-    return (status::HaveStatusInfo::globalFlag_ & 2) != 0;
+    return (status::HaveStatusInfo::globalFlag_ >> 1) & 1;
 }
 
 
@@ -1071,7 +1071,7 @@ void status::HaveStatusInfo::setGlbRebirthStone(bool flag)
 
 int status::HaveStatusInfo::isGlbRebirthStone()
 {
-    return (status::HaveStatusInfo::globalFlag_ & 4) != 0;
+    return (status::HaveStatusInfo::globalFlag_ >> 2) & 1;
 }
 
 void status::HaveStatusInfo::setDrawCtrlId(HaveStatusInfo_0* self, int ctrl)
@@ -1200,42 +1200,42 @@ void status::HaveStatusInfo::rebirth(HaveStatusInfo_0* self)
 void status::HaveStatusInfo::setActionDisable(HaveStatusInfo_0* self, bool flag)
 {
     if (flag)
-        self->battleFlag_.set(8);
+        self->flag_.set(8);
     else
-        self->battleFlag_.clear(8);
+        self->flag_.clear(8);
 }
 
 void status::HaveStatusInfo::setAddEffectDamage(HaveStatusInfo_0* self, bool flag)
 {
     if (flag)
-        self->battleFlag_.set(21);
+        self->flag_.set(21);
     else
-        self->battleFlag_.clear(21);
+        self->flag_.clear(21);
 }
 
 void status::HaveStatusInfo::setAddEffectPoison(HaveStatusInfo_0* self, bool flag)
 {
     if (flag)
-        self->battleFlag_.set(19);
+        self->flag_.set(19);
     else
-        self->battleFlag_.clear(19);
+        self->flag_.clear(19);
 }
 
 
 void status::HaveStatusInfo::setAddEffectRecovery(HaveStatusInfo_0* self, bool flag)
 {
     if (flag)
-        self->battleFlag_.set(20);
+        self->flag_.set(20);
     else
-        self->battleFlag_.clear(20);
+        self->flag_.clear(20);
 }
 
 void status::HaveStatusInfo::setAddEffectSleep(HaveStatusInfo_0* self, bool flag)
 {
     if (flag)
-        self->battleFlag_.set(17);
+        self->flag_.set(17);
     else
-        self->battleFlag_.clear(17);
+        self->flag_.clear(17);
 }
 
 
@@ -1243,18 +1243,18 @@ void status::HaveStatusInfo::setAddEffectSleep(HaveStatusInfo_0* self, bool flag
 void status::HaveStatusInfo::setAddEffectSpazz(HaveStatusInfo_0* self, bool flag)
 {
     if (flag)
-        self->battleFlag_.set(18);
+        self->flag_.set(18);
     else
-        self->battleFlag_.clear(18);
+        self->flag_.clear(18);
 }
 
 
 void status::HaveStatusInfo::setAddMahotoraExecute(HaveStatusInfo_0* self, bool flag)
 {
     if (flag)
-        self->battleFlag_.set(31);
+        self->flag_.set(31);
     else
-        self->battleFlag_.clear(31);
+        self->flag_.clear(31);
 }
 
 void status::HaveStatusInfo::setAgility(HaveStatusInfo_0* self, uint8_t agi)
@@ -1265,9 +1265,9 @@ void status::HaveStatusInfo::setAgility(HaveStatusInfo_0* self, uint8_t agi)
 void status::HaveStatusInfo::setAstoron(HaveStatusInfo_0* self, bool flag)
 {
     if (flag)
-        self->battleFlag_.set(4);
+        self->flag2_.set(4);
     else
-        self->battleFlag_.clear(4);
+        self->flag2_.clear(4);
 }
 
 uint16_t status::HaveStatusInfo::setAttackChange(HaveStatusInfo_0* self)
@@ -1452,4 +1452,90 @@ int16_t status::HaveStatusInfo::getAgilityChange(HaveStatusInfo_0* self)
     if (isEnable)
         return self->agilityChange_;
     return 0;
+}
+
+void status::HaveStatusInfo::setMpFailure(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->flag2_.set(5);
+    else
+        self->flag2_.clear(5);
+}
+
+
+
+void status::HaveStatusInfo::setMahotoneFailure(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->flag2_.set(6);
+    else
+        self->flag2_.clear(6);
+}
+
+void status::HaveStatusInfo::setBaikirutoDisable(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->flag_.set(25);
+    else
+        self->flag_.clear(25);
+}
+
+void status::HaveStatusInfo::setImmidiateDeath(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->flag2_.set(10);
+    else
+        self->flag2_.clear(10);
+}
+
+void status::HaveStatusInfo::setWeaponAddDamage(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->flag_.set(14);
+    else
+        self->flag_.clear(14);
+}
+
+void status::HaveStatusInfo::setDamageMyself(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->flag_.set(3);
+    else
+        self->flag_.clear(3);
+}
+
+void status::HaveStatusInfo::setCounterDamage(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->flag_.set(28);
+    else
+        self->flag_.clear(28);
+}
+
+bool status::HaveStatusInfo::isTargetJoukForTest(HaveStatusInfo_0* self)
+{
+    return self->testFlag_.test(0);;
+}
+
+void status::HaveStatusInfo::setKillMyself(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->flag_.set(16);
+    else
+        self->flag_.clear(16);
+}
+
+
+bool status::HaveStatusInfo::isKillMyself(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(16);
+}
+
+
+void status::HaveStatusInfo::setMonsterChange(HaveStatusInfo_0* self, bool flag)
+{
+    if (flag)
+        self->flag_.set(24);
+    else
+        self->flag_.clear(24);
 }
