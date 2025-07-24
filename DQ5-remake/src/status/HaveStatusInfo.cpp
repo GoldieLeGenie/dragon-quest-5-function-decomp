@@ -302,7 +302,7 @@ int status::HaveStatusInfo::setItemEquipment(HaveStatusInfo_0* self,int itemInde
     if (itemIndex == 0)
         return -1;
 
-    int itemPos = status::HaveItem::add(&self->haveItem_, itemIndex);  
+    int itemPos = self->haveItem_.add(itemIndex);
     status::HaveStatusInfo::setEquipment(self,itemPos);                   
     return itemPos;
 }
@@ -609,7 +609,7 @@ uint8_t status::HaveStatusInfo::getLuck(HaveStatusInfo_0* self, int effect) {
 
 void status::HaveStatusInfo::clearAllItem(HaveStatusInfo_0* self)
 {
-    status::HaveItem::clear(&self->haveItem_);
+    self->haveItem_.clear();
     status::HaveEquipment::clear(&self->haveEquipment_);
 }
 
@@ -704,7 +704,7 @@ void status::HaveStatusInfo::setup(HaveStatusInfo_0* self, int index, bool flag)
         self->characterType_ = dq5::level::CharacterType::MONSTER;
         status::HaveStatus::setup(&self->haveStatus_, index, 0);
         //status::HaveItem::setup(&self->haveItem_, 1);
-        status::HaveItem::clear(&self->haveItem_);
+        self->haveItem_.clear();
         status::HaveEquipment::setup(&self->haveEquipment_, &self->haveItem_);
         //status::ActionDefence::setup(&self->actionDefence_, self->index_, dq5::level::CharacterType::MONSTER);
         status::StatusChange::clear(&self->statusChange_);
@@ -1538,4 +1538,23 @@ void status::HaveStatusInfo::setMonsterChange(HaveStatusInfo_0* self, bool flag)
         self->flag_.set(24);
     else
         self->flag_.clear(24);
+}
+
+
+void status::HaveStatusInfo::levelup(HaveStatusInfo_0* self, int level)
+{
+    if (level != 0)
+    {
+        int levelMax = level;
+        if (self->haveStatus_.levelMax_ < level)
+            levelMax = self->haveStatus_.levelMax_;
+
+        status::HaveStatus::debugLevelup(&self->haveStatus_, levelMax);
+        status::HaveAction::debugLevelup(&self->haveAction_, levelMax);
+    }
+    else
+    {
+        status::HaveStatus::levelup(&self->haveStatus_, 0);
+        status::HaveAction::levelup(&self->haveAction_, self->index_, self->haveStatus_.level_, true);
+    }
 }

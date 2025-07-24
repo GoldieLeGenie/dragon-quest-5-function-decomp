@@ -48,7 +48,8 @@ namespace dq5::level {
         int8_t   byte_10;       // 0x31
         int8_t   byte_11;       // 0x32
         uint8_t  dummy0;        // 0x33
-       
+
+       static MonsterData* monsterData2_;
     };
-    extern MonsterData* monsterData2_;
+    
 }

@@ -31,25 +31,26 @@ void status::UseItem::give(status::BaseHaveItem* srcHaveItem, int index, status:
             int lastItem = status::BaseHaveItem::getItem(desHaveItem, lastIndex);
 
             // Supprimer le dernier objet de la destination
-            status::BaseHaveItem::del(desHaveItem, lastIndex);
+            desHaveItem->del(lastIndex);
+
 
             // Ajouter l'objet source dans la destination
             int itemToMove = status::BaseHaveItem::getItem(srcHaveItem, index);
-            status::BaseHaveItem::add(desHaveItem, itemToMove);
+            desHaveItem->add(itemToMove);
 
             // Supprimer l’objet source de son inventaire
-            status::BaseHaveItem::del(srcHaveItem, index);
+            srcHaveItem->del(index);
 
             // Réinsérer l’ancien dernier objet dans la source
-            status::BaseHaveItem::add(srcHaveItem, lastItem);
+            srcHaveItem->add(lastItem);
         }
     }
     else
     {
         // Transfert direct si la destination n’est pas pleine
         int itemToMove = status::BaseHaveItem::getItem(srcHaveItem, index);
-        status::BaseHaveItem::add(desHaveItem, itemToMove);
-        status::BaseHaveItem::del(srcHaveItem, index);
+        desHaveItem->add(itemToMove);
+        srcHaveItem->del(index);
     }
 }
 
@@ -656,10 +657,10 @@ void status::UseItem::execUse(UseActionParam* useActionParam)
 
         if (*reinterpret_cast<uint8_t*>(status::UseItem::itemData2_ + 39) & 0x2) {
             if (actorSack) {
-                status::UseItem::itemIndex_ = status::BaseHaveItem::del(actorSack, sortIndex);
+                status::UseItem::itemIndex_ = actorSack->del(sortIndex);
             }
             else if (auto* actor = useActionParam->actorCharacterStatus_) {
-                status::BaseHaveItem::del(&actor->haveStatusInfo_.haveItem_, sortIndex);
+                actor->haveStatusInfo_.haveItem_.del(sortIndex);
             }
         }
 
@@ -668,10 +669,10 @@ void status::UseItem::execUse(UseActionParam* useActionParam)
             status::UseActionFlag::setBreakPrayRing(false);
 
             if (actorSack) {
-                status::UseItem::itemIndex_ = status::BaseHaveItem::del(actorSack, sortIndex);
+                status::UseItem::itemIndex_ = actorSack->del(sortIndex);
             }
             else if (auto* actor = useActionParam->actorCharacterStatus_) {
-                status::BaseHaveItem::del(&actor->haveStatusInfo_.haveItem_, sortIndex);
+                actor->haveStatusInfo_.haveItem_.del(sortIndex);
             }
         }
     }
@@ -680,7 +681,7 @@ void status::UseItem::execUse(UseActionParam* useActionParam)
 
 void status::UseItem::execThrow(int index, BaseHaveItem* haveItem)
 {
-    status::BaseHaveItem::del(haveItem,index);
+    haveItem->del(index);
 }
 
 
@@ -790,8 +791,9 @@ void status::UseItem::give2(HaveItemSack* srcHaveItemSack,int srcIndex,HaveStatu
         int oldIndex = desItemData->index_;
         desItemData->index_ = srcItemData->index_;
         status::ItemData::setEquipment(desItemData, false);
-        status::HaveItemSack::del(srcHaveItemSack, srcIndex);
-        status::HaveItemSack::add(srcHaveItemSack, oldIndex);
+        srcHaveItemSack->del(srcIndex);
+        srcHaveItemSack->add(oldIndex);
+
     }
 }
 
@@ -823,10 +825,10 @@ void status::UseItem::give2(HaveStatusInfo_0* srcHaveStatusInfo,int srcIndex,Hav
             )[124];  // offset 124 → champ index_
 
         // add l’ancien item dans le sac
-        status::HaveItemSack::add(desHaveItemSack, statusItemIndex);
+        desHaveItemSack->add(statusItemIndex);
 
         // remove l’objet à desIndex
-        status::HaveItemSack::del(desHaveItemSack, desIndex);
+        desHaveItemSack->del(desIndex);
 
         // remplacer l’index dans HaveStatusInfo_0 par celui du nouvel item
         statusItemIndex = itemId;
@@ -905,10 +907,7 @@ void status::UseItem::execBattleUse(UseActionParam* useActionParam)
 
     if (flag & 0x02)
     {
-        status::BaseHaveItem::del(
-            &useActionParam->actorCharacterStatus_->haveStatusInfo_.haveItem_,
-            itemSortIndex
-        );
+        useActionParam->actorCharacterStatus_->haveStatusInfo_.haveItem_.del(itemSortIndex);
     }
 }
 

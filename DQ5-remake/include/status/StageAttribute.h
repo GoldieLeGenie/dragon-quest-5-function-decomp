@@ -27,6 +27,9 @@ namespace status {
         static bool isCarriageEnable(const StageAttribute* self);
         static bool isCarriageEnter(const StageAttribute* self);
         static const char* getMapName(const StageAttribute*);
+        static int isToramana();
+        static bool isEncount(const StageAttribute* self);
+        static char toramana_;
     };
     extern StageAttribute* g_StageAttribute;
 } 

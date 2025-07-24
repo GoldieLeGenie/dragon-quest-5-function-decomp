@@ -82,27 +82,27 @@ void status::BaseHaveItem::sort(BaseHaveItem* self) {
     delete[] temp;
 }
 
-int status::BaseHaveItem::add(BaseHaveItem* self, int itemIndex)
+int status::BaseHaveItem::add(int itemIndex)
 {
     if (itemIndex == 0)
         return -1; 
 
-    if (self->itemMax_ < 1)
+    if (this->itemMax_ < 1)
         return 0; 
 
     int result = 0;
 
-    for (int i = 0; i < self->itemMax_; ++i)
+    for (int i = 0; i < this->itemMax_; ++i)
     {
-        if (self->item_[i].index_ == 0)
+        if (this->item_[i].index_ == 0)
         {
-            self->item_[i].index_ = itemIndex;
-            self->item_[i].count_ = 1;
+            this->item_[i].index_ = itemIndex;
+            this->item_[i].count_ = 1;
             return i;
         }
 
         ++result;
-        if (result >= self->itemMax_)
+        if (result >= this->itemMax_)
             return 0;
     }
 
@@ -110,10 +110,10 @@ int status::BaseHaveItem::add(BaseHaveItem* self, int itemIndex)
 }
 
 
-bool status::BaseHaveItem::del(BaseHaveItem* self, int ctrlId) {
-    if (ctrlId < 0 || ctrlId >= self->itemMax_ || self->item_ == nullptr) return false;
-    self->item_[ctrlId] = ItemData();
-    status::BaseHaveItem::sort(self);
+bool status::BaseHaveItem::del(int ctrlId) {
+    if (ctrlId < 0 || ctrlId >= this->itemMax_ || this->item_ == nullptr) return false;
+    this->item_[ctrlId] = ItemData();
+    status::BaseHaveItem::sort(this);
     return true;
 }
 
@@ -154,7 +154,7 @@ bool status::BaseHaveItem::isEquipment(const BaseHaveItem* self,int index){
 void status::BaseHaveItem::resetEquipment(BaseHaveItem* self, int index) {
     if (index < 0 || index >= self->itemMax_ || self->item_ == nullptr) return;
     self->item_[index].flag_.clear(0);
-    status::BaseHaveItem::sortEquipment(self);
+    self->sortEquipment(self);
 }
 
 int status::BaseHaveItem::getItemSortIndex(const BaseHaveItem* self, int itemIndex){
@@ -192,7 +192,7 @@ void status::BaseHaveItem::setEquipment(BaseHaveItem* self, int index) {
         item.flag_.set(1);
     }
 
-    status::BaseHaveItem::sortEquipment(self);
+    self->sortEquipment(self);
 
 }
 
@@ -218,10 +218,10 @@ status::BaseHaveItem::BaseHaveItem(ItemData* itemData, int itemMax)
     }
 }
 
-void status::BaseHaveItem::clear(BaseHaveItem* self) {
-    if (self->item_ && self->itemMax_ >= 1)
-        for (int i = 0; i < self->itemMax_; ++i)
-            self->item_[i] = ItemData();
+void status::BaseHaveItem::clear() {
+    if (this->item_ && this->itemMax_ >= 1)
+        for (int i = 0; i < this->itemMax_; ++i)
+            this->item_[i] = ItemData();
 }
 
 void status::BaseHaveItem::setSpell(BaseHaveItem* self, int index, bool flag) {
@@ -261,6 +261,6 @@ int status::BaseHaveItem::addOne(BaseHaveItem* self,int itemIndex) {
 
 
 void status::BaseHaveItem::execThrow(int index, BaseHaveItem* haveItem) {
-    haveItem->del(haveItem,index);  // appel virtuel réel
+    haveItem->del(index);  
 }
 

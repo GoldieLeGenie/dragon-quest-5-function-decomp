@@ -320,13 +320,14 @@ void status::PlayerData::setup(PlayerData* self, bool useNameId, int kind, int p
 
     self->baseStatus_.exp_ = *reinterpret_cast<uint32_t*>(record + 0);
 
-    status::HaveItem::clear(&self->haveItem_);
+    self->haveItem_.clear();
+
 
     // Objets initiaux (équipements)
     for (int i = 0; i < 4; ++i) {
         uint16_t itemId = *reinterpret_cast<uint16_t*>(record + 24 + 2 * i);
         if (itemId != 0) {
-            int slot = status::HaveItem::add(&self->haveItem_, itemId);
+            int slot = self->haveItem_.add(itemId);
             status::BaseHaveItem::setEquipment(&self->haveItem_, slot);
         }
     }

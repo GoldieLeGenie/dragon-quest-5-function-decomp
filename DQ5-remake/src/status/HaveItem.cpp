@@ -36,9 +36,9 @@ int status::HaveItem::getEquipmentItem(HaveItem* self,dq5::level::ItemType type,
     return 0;
 }
 
-int status::HaveItem::add(BaseHaveItem* self, int itemIndex)
+int status::HaveItem::add(int itemIndex)
 {
-    return status::BaseHaveItem::addOne(self, itemIndex);
+    return status::BaseHaveItem::addOne(this, itemIndex);
 }
 
 bool status::HaveItem::isSpace(HaveItem* self)
@@ -150,3 +150,4 @@ void status::HaveItem::cleanup(HaveItem* self, int index)
 {
    /*to do*/
 }
+

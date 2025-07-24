@@ -3,9 +3,9 @@
 namespace dq5::level {
 
     enum class CharacterType : int32_t {
-        PLAYER = 0x0,
-        MONSTER = 0x1,
-        NONE = 0x2
+        PLAYER = 0,
+        MONSTER = 1,
+        NONE = 2
     };
 
     

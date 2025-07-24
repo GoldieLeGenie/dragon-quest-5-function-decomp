@@ -4,7 +4,7 @@ namespace status {
 
     struct PartyStatus {
         int memberCount_; // offset = 0x131
-
+        
     
     };
 

@@ -12,6 +12,7 @@ namespace dq5::level {
         static const char* filename_[];
         static int loadSwitch_;
 
+        dq5::level::CharacterInitData *characterInitData2_;
 
         uint32_t exp;              // 0x00: Experience
         uint16_t friendID;         // 0x04

@@ -7,4 +7,5 @@ namespace dq5::level {
 	const char* CharacterInitData::filename_[] = { "./LEVELDATA/dq5ds_character_init.dat" };
 	int CharacterInitData::loadSwitch_ = 1;
 
+	
 }

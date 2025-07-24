@@ -8,6 +8,7 @@ namespace status {
 
     struct BaseHaveItem {
         ~BaseHaveItem();
+        BaseHaveItem();
         BaseHaveItem& operator=(const BaseHaveItem& rhs);
         ItemData* item_;      // 0x08 (8 bytes on x64)
         int itemMax_;         // 0x10 (4 bytes)
@@ -19,10 +20,9 @@ namespace status {
         static int getCount(const BaseHaveItem* self);
         static bool isItem(const BaseHaveItem* self, int itemIndex);
         static void sort(BaseHaveItem* self);
-        static int add(BaseHaveItem* self, int itemIndex);
-        static bool del(BaseHaveItem* self, int ctrlId);
-        static void sortEquipment(BaseHaveItem* self);
-        BaseHaveItem();
+        virtual int add(int itemIndex);
+        virtual bool del(int ctrlId);
+        virtual void sortEquipment(BaseHaveItem* self);
         static bool delOne(BaseHaveItem* self, int ctrlId);
         static bool isEquipment(const BaseHaveItem* self, int index);
         static void resetEquipment(BaseHaveItem* self, int index);
@@ -32,11 +32,12 @@ namespace status {
         static int getItemMax(BaseHaveItem* self);
         static ItemData* getItemData(BaseHaveItem* self,int index);
         BaseHaveItem(ItemData* itemData, int itemMax);
-        static void clear(BaseHaveItem* self);
+        virtual void clear();
         static void setSpell(BaseHaveItem* self,int index, bool flag);
         static bool isSpell(BaseHaveItem* self,int index);
         static int addOne(BaseHaveItem* self, int itemIndex);
         static void execThrow(int index, BaseHaveItem* haveItem);
+        
     };
 
     

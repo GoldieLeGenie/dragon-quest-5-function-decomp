@@ -10,6 +10,16 @@ namespace status {
     extern int parupunteEventEffects[10];
 
     struct HaveBattleStatus {
+        enum class SelectCommand :int32_t
+        {                                      
+            Attack = 0x0,
+            Defence = 0x1,
+            UseAction = 0x2,
+            UseItem = 0x3,
+            NoSelect = 0x4,
+            AISelect = 0x5,
+        };
+
         int groupIndex_;                       // 0x00
         int index_;                            // 0x04
         int originalIndex_;                    // 0x08
@@ -25,30 +35,17 @@ namespace status {
         uint16_t protection_;                  // 0x26
         uint16_t agility_;                     // 0x28
         uint16_t wisdom_;                      // 0x2A
-        uint8_t luck_;                         // 0x2C
-
+        uint8_t luck_;                         // 
         int texp_;                             // 0x30
         int tlevel_;                           // 0x34
         bool change_;                          // 0x38
-
         int actionIndex_;                      // 0x3C
         int actionCount_;                      // 0x40
         int patternIndex_;                     // 0x44
         ar::Flag32 patternFailedFlag_;           // 0x48
         ar::Flag32 disablePattern_;              // 0x4C
-        ar::Flag32 disablePattern2nd_;           // 0x50
-
-        enum class SelectCommand :int32_t
-        {                                       // XREF: status::HaveBattleStatus/r
-                                                 // status::HaveBattleStatus_0/r
-            Attack = 0x0,
-            Defence = 0x1,
-            UseAction = 0x2,
-            UseItem = 0x3,
-            NoSelect = 0x4,
-            AISelect = 0x5,
-        };
-
+        ar::Flag32 disablePattern2nd_;           // 
+        status::HaveBattleStatus::SelectCommand selectCommand_;
         int selectIndex_;                      // 0x58
         int selectedGroup_;                    // 0x5C
         int selectedTarget_;                   // 0x60
@@ -58,8 +55,7 @@ namespace status {
         bool escape_;                          // 0x70
         uint8_t brains_;                       // 0x71
         uint8_t group_[6];                     // 0x72
-        uint8_t crossFire_;                    // 0x78
-
+        uint8_t crossFire_;                    // 
         int crossFireTarget_;                  // 0x7C
         uint8_t multi_;                        // 0x80
         int8_t multiCount_;                    // 0x81
@@ -73,18 +69,22 @@ namespace status {
         uint8_t zombi_;                        // 0x89
         uint8_t air_;                          // 0x8A
         uint8_t slime_;                        // 0x8B
-        uint8_t jouk_;                         // 0x8C
-
+        uint8_t jouk_;                         // 
         int monsterIndexForNpc_;               // 0x90
         int roundActionIndex_;                 // 0x94
-        uint8_t mosyasAction_[17];             // 0x98
-
-
+        uint8_t mosyasAction_[17];             
         int mosyasActionCount_;                // 0xAC
-        /*void setupParupunteAction();*/
+        
+
+
+        static void setSelectCommand(HaveBattleStatus* self, status::HaveBattleStatus::SelectCommand command, int index);
         static int getParupunteAction(HaveBattleStatus*, bool event);
         static void setActionFailed(HaveBattleStatus* self, int actionIndex);
         static void setActionIndexForMonster(HaveBattleStatus* self);
+        static void setup(HaveBattleStatus* self, dq5::level::CharacterType type, int group, int index);
+        static void setupMonster(HaveBattleStatus* self);
+        static void changeMonsterWithoutHpMp(HaveBattleStatus* self, int index);
+        static void changeMonster(HaveBattleStatus* self, int index);
         static bool eventFlag_;
     };
 } 

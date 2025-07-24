@@ -7,7 +7,7 @@
 
 namespace status {
 
-    struct alignas(4) HaveItemSack : public BaseHaveItem {
+    struct HaveItemSack : public BaseHaveItem {
         enum class SortType : uint32_t {
             None = 0,
             ByType = 1,
@@ -22,5 +22,3 @@ namespace status {
     };
 
 } 
-
-#pragma pack(pop)

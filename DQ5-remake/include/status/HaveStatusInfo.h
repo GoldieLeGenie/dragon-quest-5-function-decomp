@@ -210,6 +210,7 @@ namespace status {
         static void setKillMyself(HaveStatusInfo_0* self, bool flag);
         static bool isKillMyself(HaveStatusInfo_0* self);
         static void setMonsterChange(HaveStatusInfo_0* self, bool flag);
+        static void levelup(HaveStatusInfo_0* self, int level);
         HaveStatusInfo();
         ~HaveStatusInfo();
 
