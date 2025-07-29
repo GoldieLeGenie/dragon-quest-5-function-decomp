@@ -85,6 +85,7 @@ namespace status {
         static void resetExpGold(HaveStatus* self);
         static void cleanupPlayer(HaveStatus* self);
         static void cleanup(HaveStatus* self);
+        static int getLevelupExp(const status::HaveStatus* self);
         ~HaveStatus();
         HaveStatus();
     };

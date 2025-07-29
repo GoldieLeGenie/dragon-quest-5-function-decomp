@@ -235,3 +235,30 @@ void status::HaveBattleStatus::setSelectCommand(HaveBattleStatus* self,status::H
     self->selectIndex_ = index;
 }
 
+
+void status::HaveBattleStatus::changeMonsterReverse(HaveBattleStatus* self)
+{
+    if (self->change_)
+        status::HaveBattleStatus::newBaseChangeMonsterReverse2(self);
+}
+
+void status::HaveBattleStatus::newBaseChangeMonsterReverse2(HaveBattleStatus* self)
+{
+    int originalIndex; 
+    dq5::level::CharacterType originalType; 
+
+    originalIndex = self->originalIndex_;
+    originalType = self->originalType_;
+    self->change_ = 0;
+    self->index_ = originalIndex;
+    self->type_ = originalType;
+    if (originalType == dq5::level::CharacterType::MONSTER)
+    {
+        status::HaveStatusInfo::setupActionDefence((status::HaveStatusInfo_0*)self->haveStatusInfo_, originalIndex, 0);
+        status::HaveBattleStatus::setupMonster(self);
+    }
+    else if (originalType == dq5::level::CharacterType::PLAYER)
+    {
+        status::HaveStatusInfo::setupActionDefence((status::HaveStatusInfo_0*)self->haveStatusInfo_);
+    }
+}

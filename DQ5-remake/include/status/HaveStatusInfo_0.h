@@ -1,6 +1,5 @@
 ﻿// HaveStatusInfo_0.h
 #pragma once
-
 #include "ar/BitFlag.h"
 #include "status/ActionDefence.h"
 #include "status/HaveBattleStatus.h"
@@ -13,7 +12,6 @@
 #include "dq5/CharacterType.h"
 
 namespace status {
-    // Déclaration anticipée pour résoudre la dépendance croisée
     struct HaveBattleStatus;
     struct HaveStatusInfo;
 

@@ -3,6 +3,7 @@
 #include "status/UseAction.h"
 #include "status/HaveStatusInfo.h"
 #include "status/HaveEquipment.h"
+#include "status/PartyStatus.h"
 #include "ar/rand.h"
 
 
@@ -53,4 +54,5 @@ bool status::ActionCheckActor::isAlive(status::UseActionParam* self)
 
     return true;
 }
+
 

@@ -20,9 +20,9 @@ namespace status {
         static int getCount(const BaseHaveItem* self);
         static bool isItem(const BaseHaveItem* self, int itemIndex);
         static void sort(BaseHaveItem* self);
-        virtual int add(int itemIndex);
-        virtual bool del(int ctrlId);
-        virtual void sortEquipment(BaseHaveItem* self);
+        virtual int VBaseHaveItemAdd(int itemIndex);
+        virtual bool VBaseHaveItemDel(int ctrlId);
+        virtual void VBaseHaveItemSortEquipment(BaseHaveItem* self);
         static bool delOne(BaseHaveItem* self, int ctrlId);
         static bool isEquipment(const BaseHaveItem* self, int index);
         static void resetEquipment(BaseHaveItem* self, int index);
@@ -32,11 +32,12 @@ namespace status {
         static int getItemMax(BaseHaveItem* self);
         static ItemData* getItemData(BaseHaveItem* self,int index);
         BaseHaveItem(ItemData* itemData, int itemMax);
-        virtual void clear();
+        virtual void VBaseHaveItemClear();
         static void setSpell(BaseHaveItem* self,int index, bool flag);
         static bool isSpell(BaseHaveItem* self,int index);
         static int addOne(BaseHaveItem* self, int itemIndex);
         static void execThrow(int index, BaseHaveItem* haveItem);
+        static bool delNum(BaseHaveItem* self, int ctrlId);
         
     };
 

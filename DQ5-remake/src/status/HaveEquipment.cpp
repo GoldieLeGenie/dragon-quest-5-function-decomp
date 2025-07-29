@@ -143,7 +143,11 @@ void status::HaveEquipment::setup(HaveEquipment* self, HaveItem* haveItem)
 void status::HaveEquipment::setup(HaveEquipment* self, int index)
 {
     self->luck_ = 0;
-    *&self->strength_ = 0;
-    *&self->attack_ = 0;
+    self->strength_ = 0;
+    self->attack_ = 0;
     self->playerIndex_ = index;
+}
+
+status::HaveEquipment::~HaveEquipment() {
+
 }

@@ -314,10 +314,10 @@ void status::PlayerStatus::print(status::PlayerStatus* self)
 
 void status::PlayerStatus::addItem(PlayerStatus* self, int itemIndex)
 {
-    self->haveStatusInfo_.haveItem_.add(itemIndex);
+    self->haveStatusInfo_.haveItem_.VBaseHaveItemAdd(itemIndex);
 }
 
 void status::PlayerStatus::delItem(PlayerStatus* self, int index)
 {
-    self->haveStatusInfo_.haveItem_.del(index);
+    self->haveStatusInfo_.haveItem_.VBaseHaveItemDel(index);
 }

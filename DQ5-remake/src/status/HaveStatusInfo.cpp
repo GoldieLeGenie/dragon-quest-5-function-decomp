@@ -221,9 +221,9 @@ bool status::HaveStatusInfo::isKaishin(HaveStatusInfo_0* self)
 }
 
 
-bool status::HaveStatusInfo::isMultiAttack(HaveStatusInfo_0* self) {
-    uint8_t byte1 = static_cast<uint8_t>((self->flag_.get() >> 8) & 0xFF);
-    return (byte1 >> 2) & 0x1;
+bool status::HaveStatusInfo::isMultiAttack(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(10);
 }
 
 
@@ -288,7 +288,7 @@ void status::HaveStatusInfo::setHp(HaveStatusInfo_0* self, uint16_t hp)
     if (!self->noDamage_)
     {
         status::HaveStatus::setHp(&self->haveStatus_, hp);
-       /* status::HaveStatusInfo::execDeath(self); NEED TO DO */
+        status::HaveStatusInfo::execDeath(self);
     }
 }
 
@@ -302,7 +302,7 @@ int status::HaveStatusInfo::setItemEquipment(HaveStatusInfo_0* self,int itemInde
     if (itemIndex == 0)
         return -1;
 
-    int itemPos = self->haveItem_.add(itemIndex);
+    int itemPos = self->haveItem_.VBaseHaveItemAdd(itemIndex);
     status::HaveStatusInfo::setEquipment(self,itemPos);                   
     return itemPos;
 }
@@ -484,8 +484,7 @@ void status::HaveStatusInfo::addHp(HaveStatusInfo_0* self,int hp) {
             }
         }
 
-        /*NEED TO DO
-        status::HaveStatusInfo::execDeath(self);*/
+        status::HaveStatusInfo::execDeath(self);
     }
 }
 
@@ -609,7 +608,7 @@ uint8_t status::HaveStatusInfo::getLuck(HaveStatusInfo_0* self, int effect) {
 
 void status::HaveStatusInfo::clearAllItem(HaveStatusInfo_0* self)
 {
-    self->haveItem_.clear();
+    self->haveItem_.VBaseHaveItemClear();
     status::HaveEquipment::clear(&self->haveEquipment_);
 }
 
@@ -704,7 +703,7 @@ void status::HaveStatusInfo::setup(HaveStatusInfo_0* self, int index, bool flag)
         self->characterType_ = dq5::level::CharacterType::MONSTER;
         status::HaveStatus::setup(&self->haveStatus_, index, 0);
         //status::HaveItem::setup(&self->haveItem_, 1);
-        self->haveItem_.clear();
+        self->haveItem_.VBaseHaveItemClear();
         status::HaveEquipment::setup(&self->haveEquipment_, &self->haveItem_);
         //status::ActionDefence::setup(&self->actionDefence_, self->index_, dq5::level::CharacterType::MONSTER);
         status::StatusChange::clear(&self->statusChange_);
@@ -873,10 +872,6 @@ void status::HaveStatusInfo::setCommandRandom(HaveStatusInfo_0* self, bool flag)
         self->flag_.clear(0);
 }
 
-bool status::HaveStatusInfo::isCommandRandom(HaveStatusInfo_0* self)
-{
-    return self->flag_.test(0);
-}
 
 void status::HaveStatusInfo::setZaoraruFailed(HaveStatusInfo_0* self, bool flag)
 {
@@ -1557,4 +1552,613 @@ void status::HaveStatusInfo::levelup(HaveStatusInfo_0* self, int level)
         status::HaveStatus::levelup(&self->haveStatus_, 0);
         status::HaveAction::levelup(&self->haveAction_, self->index_, self->haveStatus_.level_, true);
     }
+}
+
+void status::HaveStatusInfo::execDeath(status::HaveStatusInfo_0* self)
+{
+    status::HaveBattleStatus* haveBattleStatus; 
+
+    if (!status::HaveStatus::getHp(&self->haveStatus_))
+    {
+        status::StatusChange::release(&self->statusChange_, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_NEMURI);
+        status::StatusChange::release(&self->statusChange_, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_KONRAN);
+        status::StatusChange::release(&self->statusChange_, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_MAHOKANTA);
+        haveBattleStatus = self->haveBattleStatus_;
+        if (haveBattleStatus)
+            status::HaveBattleStatus::changeMonsterReverse(haveBattleStatus);
+    }
+}
+
+
+void status::HaveStatusInfo::setupActionDefence(HaveStatusInfo_0* self, int index, bool flag)
+{
+    status::ActionDefence::setup(&self->actionDefence_, index, (dq5::level::CharacterType) !flag);
+}
+
+int status::HaveStatusInfo::getLevelupExp(const HaveStatusInfo_0* self)
+{
+    return status::HaveStatus::getLevelupExp(&self->haveStatus_);
+}
+
+
+int status::HaveStatusInfo::getIconIndex(HaveStatusInfo_0* self)
+{
+  
+    int playerIndex = self->haveStatus_.playerIndex_;
+    if (playerIndex == 7)
+    {
+        if (status::HaveEquipment::isEquipment(&self->haveEquipment_, 69))
+            return 95;
+        playerIndex = self->haveStatus_.playerIndex_;
+    }
+    if (playerIndex == 14)
+        return status::HaveStatusInfo::getDaughterIconIndex();
+    if (playerIndex == 13)
+        return status::HaveStatusInfo::getSonIconIndex();
+    return status::HaveStatus::getIconIndex(&self->haveStatus_);
+}
+
+
+int status::HaveStatusInfo::getMpInBattle(HaveStatusInfo_0* self, status::HaveStatusInfo::DiffStatus status)
+{
+    return self->mp_[static_cast<int>(status)];
+}
+
+
+uint16_t status::HaveStatusInfo::getMpMax(const HaveStatusInfo_0* self)
+{
+    dq5::level::CharacterType characterType; 
+    unsigned int MpMax = status::HaveStatus::getMpMax(&self->haveStatus_);
+    int16_t MaxAllowedMP = 999;
+    characterType = self->characterType_;
+
+    if (MpMax < 999)
+        MaxAllowedMP = MpMax;
+    if (characterType == dq5::level::CharacterType::PLAYER)
+        MpMax = MaxAllowedMP;
+    return MpMax;
+}
+
+
+int status::HaveStatusInfo::getSpecialTargetCount(HaveStatusInfo_0* self)
+{
+    return self->specialTargetCount_;
+}
+
+int status::HaveStatusInfo::getSpecialTargetDamage(HaveStatusInfo_0* self)
+{
+    return self->specialTargetDamage_;
+}
+
+bool status::HaveStatusInfo::isAddEffectDamage(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(22);
+}
+
+
+bool status::HaveStatusInfo::isAddEffectMahotora(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(21);
+}
+
+bool status::HaveStatusInfo::isAddEffectPoison(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(19);
+}
+
+bool status::HaveStatusInfo::isAddEffectRecovery(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(20);
+}
+
+bool status::HaveStatusInfo::isAddEffectSleep(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(17);
+}
+
+bool status::HaveStatusInfo::isAddEffectSpazz(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(18);
+}
+
+bool status::HaveStatusInfo::isAddMahotoraExecute(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(31);
+}
+
+bool status::HaveStatusInfo::isAstoron(HaveStatusInfo_0* self)
+{
+    return self->flag2_.test(4);
+}
+
+bool status::HaveStatusInfo::isBaikirutoDisable(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(9);
+}
+
+bool status::HaveStatusInfo::isBossDeathFlag(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(2);
+}
+
+bool status::HaveStatusInfo::isCallFriend(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(12);
+}
+
+bool status::HaveStatusInfo::isCommandRandom(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(0);
+}
+
+void status::HaveStatusInfo::setupActionDefence(HaveStatusInfo_0* self)
+{
+    status::ActionDefence* p_actionDefence = &self->actionDefence_;
+    status::ActionDefence::setup(&self->actionDefence_, self->index_, dq5::level::CharacterType::PLAYER);
+    int playerType = static_cast<uint8_t>(self->haveStatus_.playerType_);
+    if (playerType == 5)
+    {
+        uint16_t monsterId = self->haveStatus_.monsterId_;
+        status::ActionDefence::setup(p_actionDefence, monsterId, dq5::level::CharacterType::MONSTER);
+        uint16_t playerKindIndex = self->haveStatus_.playerKindIndex_;
+        self->actionDefence_.nifram_ = 3;
+        if ((playerKindIndex & 0xFFFE) == 0x3A)
+            status::ActionDefence::setup(p_actionDefence, monsterId, dq5::level::CharacterType::PLAYER);
+    }
+    else if (playerType == 3)
+    {
+        status::ActionDefence::setup(p_actionDefence, self->haveStatus_.monsterIndex_, dq5::level::CharacterType::MONSTER);
+    }
+}
+
+bool status::HaveStatusInfo::isConfuseMissAttack(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(15);
+}
+
+
+bool status::HaveStatusInfo::isCounterDamage(status::HaveStatusInfo_0* self)
+{
+    return self->flag_.test(18);
+}
+
+
+status::HaveStatusInfo::Condition status::HaveStatusInfo::getCondition(status::HaveStatusInfo_0* self)
+{
+    if (status::HaveStatus::getHp(&self->haveStatus_) == 0)
+        return status::HaveStatusInfo::Condition::DEAD; 
+
+    status::StatusChange* p_statusChange = &self->statusChange_;
+
+    if (status::StatusChange::isEnable(p_statusChange, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_DOKU))
+        return status::HaveStatusInfo::Condition::POISON; 
+
+    if (status::StatusChange::isEnable(p_statusChange, dq5::level::ActionParam::ACTIONTYPE::ACTIONTYPE_MAHI))
+        return status::HaveStatusInfo::Condition::SPAZZ; 
+    
+    return status::HaveStatusInfo::Condition::POISON;
+}
+
+
+
+bool status::HaveStatusInfo::isDisableTextureCache(HaveStatusInfo_0* self)
+{
+    return self->flag2_.test(15);  
+}
+
+
+bool status::HaveStatusInfo::isDeathLessly(HaveStatusInfo_0* self)
+{
+    return self->battleFlag_.test(4);
+}
+
+
+bool status::HaveStatusInfo::isDisappearFlag(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(5);
+}
+
+
+bool status::HaveStatusInfo::isEquipEnable(const HaveStatusInfo_0* self, int itemIndex)
+{
+    return status::UseItem::isEquipEnable(self->haveStatus_.equipAttrIndex_, itemIndex, 0);
+}
+
+bool status::HaveStatusInfo::isEvilPriest(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(7);
+}
+
+
+bool status::HaveStatusInfo::isExecuteMeganteRing(HaveStatusInfo_0* self)
+{
+    return self->flag2_.test(12); 
+}
+
+
+bool status::HaveStatusInfo::isFirstKaishin(HaveStatusInfo_0* self)
+{
+    return self->flag2_.test(1);
+}
+
+
+bool status::HaveStatusInfo::isFirstMosyas(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(10);
+}
+
+
+bool status::HaveStatusInfo::isFubahaFlag(HaveStatusInfo_0* self)
+{
+    return self->flag_.test(1);
+}
+
+
+bool status::HaveStatusInfo::isPlayer(const HaveStatusInfo_0* self, int playerIndex)
+{
+    uint8_t playerType = static_cast<uint8_t>(self->haveStatus_.playerType_);
+
+    bool isValidType = playerType <= 5 && ((1 << playerType) & 0x26);
+
+    return isValidType && self->haveStatus_.playerIndex_ == playerIndex;
+}
+
+
+bool status::HaveStatusInfo::isNeedRecovery(HaveStatusInfo_0* self)
+{
+    status::HaveStatus* p_haveStatus; 
+
+    p_haveStatus = &self->haveStatus_;
+    int Hp = status::HaveStatus::getHp(&self->haveStatus_);
+    int HpMax = status::HaveStatus::getHpMax(p_haveStatus);
+    if (Hp == HpMax)
+    {
+        int Mp = status::HaveStatus::getMp(p_haveStatus);
+        return Mp != status::HaveStatus::getMpMax(p_haveStatus);
+    }
+    return 1;
+}
+
+bool status::HaveStatusInfo::isMpFailure(HaveStatusInfo_0* self)
+{
+    return self->flag2_.test(5);
+}
+
+
+bool status::HaveStatusInfo::isMultiFirstDeath(HaveStatusInfo_0* self)
+{
+    return self->flag2_.test(11);
+}
+
+
+bool status::HaveStatusInfo::isNearDeath(const HaveStatusInfo_0* self)
+{
+    const status::HaveStatus* p_haveStatus = &self->haveStatus_;
+
+    if (!status::HaveStatus::getHp(p_haveStatus))
+        return false;
+
+    int16_t Hp = status::HaveStatus::getHp(p_haveStatus);
+    dq5::level::CharacterType characterType = self->characterType_;
+    uint32_t HpMax = status::HaveStatus::getHpMax(p_haveStatus);
+
+    uint32_t CapHp = 999;
+    if (HpMax < 999)
+        CapHp = HpMax;
+
+    if (characterType == dq5::level::CharacterType::NONE)
+        CapHp = HpMax;
+
+    return Hp < static_cast<int>(CapHp >> 2);
+}
+
+
+uint16_t status::HaveStatusInfo::getAttackChange(HaveStatusInfo_0* self)
+{
+    return 0;
+}
+
+
+uint8_t status::HaveStatusInfo::getBaseAgility(HaveStatusInfo_0* self)
+{
+    status::HaveStatus* p_haveStatus; 
+    int EquipementAgility;
+    int BoostAgilityEquipement;
+    unsigned int TotalAgility;
+    uint8_t result;
+
+    p_haveStatus = &self->haveStatus_;
+    status::HaveStatus::getAgility(&self->haveStatus_);
+    status::HaveEquipment::calcEffect(&self->haveEquipment_);
+    if (status::HaveEquipment::getEquipment(&self->haveEquipment_, dq5::level::ItemType::ITEM_ARMOR, 0) == 70)
+        return 0;
+    int Equipment = status::HaveEquipment::getEquipment(&self->haveEquipment_, dq5::level::ItemType::ITEM_ACCESSORY, 0);
+    int Agility = status::HaveStatus::getAgility(p_haveStatus);
+
+    status::HaveEquipment::calcEffect(&self->haveEquipment_);
+
+    if (Equipment == 155)
+    {
+        EquipementAgility = self->haveEquipment_.agility_;
+        BoostAgilityEquipement = 2 * Agility;
+    }
+    else
+    {
+        BoostAgilityEquipement = self->haveEquipment_.agility_;
+        EquipementAgility = Agility;
+    }
+    TotalAgility = BoostAgilityEquipement + EquipementAgility;
+    if (!(BoostAgilityEquipement + EquipementAgility))
+        return 0;
+    result = -1;
+    if (TotalAgility <= 0xFE)
+        return TotalAgility;
+    return result;
+}
+
+uint16_t status::HaveStatusInfo::getBaseDefence(HaveStatusInfo_0* self)
+{
+    status::HaveEquipment* p_haveEquipment = &self->haveEquipment_;
+    dq5::level::CharacterType characterType = self->characterType_;
+    uint16_t protection = self->haveStatus_.baseStatus_.protection_;
+
+    status::HaveEquipment::calcEffect(p_haveEquipment);
+
+    int16_t currentProtection = protection;
+    if (protection >= 0xFF)
+        currentProtection = 255;
+    if (characterType != dq5::level::CharacterType::NONE)
+        currentProtection = protection;
+
+    int16_t totalProtection = currentProtection + self->haveEquipment_.defence_;
+
+    if (status::HaveEquipment::isEquipment(p_haveEquipment, 117) ||
+        status::HaveEquipment::isEquipment(p_haveEquipment, 23))
+    {
+        totalProtection = 0;
+    }
+    else if (status::HaveEquipment::isEquipment(p_haveEquipment, 66))
+    {
+        totalProtection = 54;
+    }
+
+    if (totalProtection <= 0)
+        totalProtection = 0;
+    else if (totalProtection >= 9999)
+        return 9999;
+
+    return static_cast<uint16_t>(totalProtection);
+}
+
+
+uint8_t status::HaveStatusInfo::getBeforeAgility(const HaveStatusInfo_0* self, int itemIndex)
+{
+    int calcNoEquipmentItemIndex; 
+    int calcEquipmentItemIndex; 
+    int EquipmentStrength;
+    int EquipmentMp;
+    int EquipmentDefence;
+    status::HaveItem* haveItem; 
+    int Agility; 
+    int EquipmentAgility;
+    uint8_t result; 
+    status::HaveEquipment HaveEquipment;
+
+    calcNoEquipmentItemIndex = self->haveEquipment_.calcNoEquipmentItemIndex_;
+    calcEquipmentItemIndex = self->haveEquipment_.calcEquipmentItemIndex_;
+    EquipmentStrength = self->haveEquipment_.strength_;
+    HaveEquipment.playerIndex_ = self->haveEquipment_.playerIndex_;
+    HaveEquipment.calcNoEquipmentItemIndex_ = calcNoEquipmentItemIndex;
+    HaveEquipment.calcEquipmentItemIndex_ = calcEquipmentItemIndex;
+    HaveEquipment.strength_ = EquipmentStrength;
+    EquipmentMp = self->haveEquipment_.mp_;
+    EquipmentDefence = self->haveEquipment_.defence_;
+    haveItem = self->haveEquipment_.haveItem_;
+    HaveEquipment.luck_ = self->haveEquipment_.luck_;
+    HaveEquipment.mp_ = EquipmentMp;
+    HaveEquipment.defence_ = EquipmentDefence;
+    HaveEquipment.haveItem_ = haveItem;
+    HaveEquipment.calcNoEquipmentItemIndex_ = itemIndex;
+    Agility = status::HaveStatus::getAgility(&self->haveStatus_);
+
+
+    status::HaveEquipment::calcEffect(&HaveEquipment);
+    EquipmentAgility = HaveEquipment.agility_;
+    HaveEquipment.~HaveEquipment();
+    result = EquipmentAgility + Agility;
+    if (static_cast<unsigned int>(result) >= 0xFF)
+        return -1;
+    return result;
+}
+
+
+int16_t status::HaveStatusInfo::getBeforeAttack(const HaveStatusInfo_0* self, int itemIndex)
+{
+    int calcNoEquipmentItemIndex; 
+    int calcEquipmentItemIndex; 
+    int EquipmentStrength;
+    int EquipmentMp;
+    int EquipmentDefence;
+    status::HaveItem* haveItem; 
+    int strength; 
+    int attack; 
+    int16_t MaxAttack;
+    status::HaveEquipment HaveEquipment;
+
+    calcNoEquipmentItemIndex = self->haveEquipment_.calcNoEquipmentItemIndex_;
+    calcEquipmentItemIndex = self->haveEquipment_.calcEquipmentItemIndex_;
+    EquipmentStrength = self->haveEquipment_.strength_;
+    HaveEquipment.playerIndex_ = self->haveEquipment_.playerIndex_;
+    HaveEquipment.calcNoEquipmentItemIndex_ = calcNoEquipmentItemIndex;
+    HaveEquipment.calcEquipmentItemIndex_ = calcEquipmentItemIndex;
+    HaveEquipment.strength_ = EquipmentStrength;
+    EquipmentMp = self->haveEquipment_.mp_;
+    EquipmentDefence = self->haveEquipment_.defence_;
+    haveItem = self->haveEquipment_.haveItem_;
+    HaveEquipment.luck_ = self->haveEquipment_.luck_;
+    HaveEquipment.mp_ = EquipmentMp;
+    HaveEquipment.defence_ = EquipmentDefence;
+    HaveEquipment.haveItem_ = haveItem;
+    HaveEquipment.calcNoEquipmentItemIndex_ = itemIndex;
+    strength = self->haveStatus_.baseStatus_.strength_;
+    status::HaveEquipment::calcEffect(&HaveEquipment);
+    attack = HaveEquipment.attack_;
+    HaveEquipment.~HaveEquipment();
+    MaxAttack = 9999;
+    if (static_cast<unsigned int>((attack + strength)) < 9999)
+        return attack + strength;
+    return MaxAttack;
+}
+
+
+int16_t status::HaveStatusInfo::getBeforeDefence(const HaveStatusInfo_0* self, int itemIndex)
+{
+    int calcNoEquipmentItemIndex; 
+    int calcEquipmentItemIndex; 
+    int EquipmentStrength;
+    int EquipmentMp;
+    int EquipmentDefence;
+    status::HaveItem* haveItem; 
+    int protection; 
+    int defence; 
+    short MaxDef; 
+    status::HaveEquipment HaveEquipment;
+
+    calcNoEquipmentItemIndex = self->haveEquipment_.calcNoEquipmentItemIndex_;
+    calcEquipmentItemIndex = self->haveEquipment_.calcEquipmentItemIndex_;
+    EquipmentStrength = self->haveEquipment_.strength_;
+    HaveEquipment.playerIndex_ = self->haveEquipment_.playerIndex_;
+    HaveEquipment.calcNoEquipmentItemIndex_ = calcNoEquipmentItemIndex;
+    HaveEquipment.calcEquipmentItemIndex_ = calcEquipmentItemIndex;
+    HaveEquipment.strength_ = EquipmentStrength;
+    EquipmentMp = self->haveEquipment_.mp_;
+    EquipmentDefence = self->haveEquipment_.defence_;
+    haveItem = self->haveEquipment_.haveItem_;
+    HaveEquipment.luck_ = self->haveEquipment_.luck_;
+    HaveEquipment.mp_ = EquipmentMp;
+    HaveEquipment.defence_ = EquipmentDefence;
+    HaveEquipment.haveItem_ = haveItem;
+    HaveEquipment.calcNoEquipmentItemIndex_ = itemIndex;
+    protection = self->haveStatus_.baseStatus_.protection_;
+    status::HaveEquipment::calcEffect(&HaveEquipment);
+    defence = HaveEquipment.defence_;
+    HaveEquipment.~HaveEquipment();
+    MaxDef = 9999;
+    if (static_cast<unsigned int>(defence + protection) < 9999)
+        return defence + protection;
+    return MaxDef;
+}
+
+uint8_t status::HaveStatusInfo::getBeforeLuck(const HaveStatusInfo_0* self, int itemIndex)
+{
+    int calcNoEquipmentItemIndex; 
+    int calcEquipmentItemIndex; 
+    int EquipmentStrength;
+    int EquipmentMp;
+    int EquipmentDefence;
+    status::HaveItem* haveItem; 
+    int Luck; 
+    int EquipmentLuck;
+    uint8_t result;
+    status::HaveEquipment HaveEquipment;
+
+    calcNoEquipmentItemIndex = self->haveEquipment_.calcNoEquipmentItemIndex_;
+    calcEquipmentItemIndex = self->haveEquipment_.calcEquipmentItemIndex_;
+    EquipmentStrength = self->haveEquipment_.strength_;
+    HaveEquipment.playerIndex_ = self->haveEquipment_.playerIndex_;
+    HaveEquipment.calcNoEquipmentItemIndex_ = calcNoEquipmentItemIndex;
+    HaveEquipment.calcEquipmentItemIndex_ = calcEquipmentItemIndex;
+    HaveEquipment.strength_ = EquipmentStrength;
+    EquipmentMp = self->haveEquipment_.mp_;
+    EquipmentDefence = self->haveEquipment_.defence_;
+    haveItem = self->haveEquipment_.haveItem_;
+    HaveEquipment.luck_ = self->haveEquipment_.luck_;
+    HaveEquipment.mp_ = EquipmentMp;
+    HaveEquipment.defence_ = EquipmentDefence;
+    HaveEquipment.haveItem_ = haveItem;
+    HaveEquipment.calcNoEquipmentItemIndex_ = itemIndex;
+    Luck = status::HaveStatus::getLuck(&self->haveStatus_);
+    status::HaveEquipment::calcEffect(&HaveEquipment);
+    EquipmentLuck = HaveEquipment.luck_;
+    HaveEquipment.~HaveEquipment();
+    result = EquipmentLuck + Luck;
+    if (static_cast<unsigned int>(EquipmentLuck + Luck) >= 0xFF)
+        return -1;
+    return result;
+}
+
+uint8_t status::HaveStatusInfo::getBeforeStrength(const HaveStatusInfo_0* self, int itemIndex)
+{
+    int calcNoEquipmentItemIndex; 
+    int calcEquipmentItemIndex; 
+    int EquipmentStrength;
+    int EquipmentMp;
+    int EquipmentDefence;
+    status::HaveItem* haveItem; 
+    uint16_t strength; 
+    uint8_t result; 
+    status::HaveEquipment HaveEquipment;
+
+    calcNoEquipmentItemIndex = self->haveEquipment_.calcNoEquipmentItemIndex_;
+    calcEquipmentItemIndex = self->haveEquipment_.calcEquipmentItemIndex_;
+    EquipmentStrength = self->haveEquipment_.strength_;
+    HaveEquipment.playerIndex_ = self->haveEquipment_.playerIndex_;
+    HaveEquipment.calcNoEquipmentItemIndex_ = calcNoEquipmentItemIndex;
+    HaveEquipment.calcEquipmentItemIndex_ = calcEquipmentItemIndex;
+    HaveEquipment.strength_ = EquipmentStrength;
+    EquipmentMp = self->haveEquipment_.mp_;
+    EquipmentDefence = self->haveEquipment_.defence_;
+    haveItem = self->haveEquipment_.haveItem_;
+    HaveEquipment.luck_ = self->haveEquipment_.luck_;
+    HaveEquipment.mp_ = EquipmentMp;
+    HaveEquipment.defence_ = EquipmentDefence;
+    HaveEquipment.haveItem_ = haveItem;
+    HaveEquipment.calcNoEquipmentItemIndex_ = itemIndex;
+    strength = self->haveStatus_.baseStatus_.strength_;
+    status::HaveEquipment::calcEffect(&HaveEquipment);
+    EquipmentStrength = HaveEquipment.strength_;
+    HaveEquipment.~HaveEquipment();
+    result = strength + EquipmentStrength;
+    if (static_cast<uint16_t>(strength + EquipmentStrength) >= 0xFF)
+        return -1;
+    return result;
+}
+
+
+uint8_t status::HaveStatusInfo::getBeforeWisdom(const HaveStatusInfo_0* self, int itemIndex)
+{
+    int calcNoEquipmentItemIndex; 
+    int calcEquipmentItemIndex; 
+    int EquipmentStrength;
+    int EquipmentMp;
+    int EquipmentDefence;
+    status::HaveItem* haveItem; 
+    int Wisdom; 
+    int EquipmentWisdom;
+    uint8_t result; 
+    status::HaveEquipment HaveEquipment;
+
+    calcNoEquipmentItemIndex = self->haveEquipment_.calcNoEquipmentItemIndex_;
+    calcEquipmentItemIndex = self->haveEquipment_.calcEquipmentItemIndex_;
+    EquipmentStrength = self->haveEquipment_.strength_;
+    HaveEquipment.playerIndex_ = self->haveEquipment_.playerIndex_;
+    HaveEquipment.calcNoEquipmentItemIndex_ = calcNoEquipmentItemIndex;
+    HaveEquipment.calcEquipmentItemIndex_ = calcEquipmentItemIndex;
+    HaveEquipment.strength_ = EquipmentStrength;
+    EquipmentMp = self->haveEquipment_.mp_;
+    EquipmentDefence = self->haveEquipment_.defence_;
+    haveItem = self->haveEquipment_.haveItem_;
+    HaveEquipment.luck_ = self->haveEquipment_.luck_;
+    HaveEquipment.mp_ = EquipmentMp;
+    HaveEquipment.defence_ = EquipmentDefence;
+    HaveEquipment.haveItem_ = haveItem;
+    HaveEquipment.calcNoEquipmentItemIndex_ = itemIndex;
+    Wisdom = status::HaveStatus::getWisdom(&self->haveStatus_);
+    status::HaveEquipment::calcEffect(&HaveEquipment);
+    EquipmentWisdom = HaveEquipment.wisdom_;
+    HaveEquipment.~HaveEquipment();
+    result = EquipmentWisdom + Wisdom;
+    if (static_cast<unsigned int>(EquipmentWisdom + Wisdom) >= 0xFF)
+        return -1;
+    return result;
 }

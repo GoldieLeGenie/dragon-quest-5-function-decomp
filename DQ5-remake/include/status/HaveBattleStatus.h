@@ -85,6 +85,8 @@ namespace status {
         static void setupMonster(HaveBattleStatus* self);
         static void changeMonsterWithoutHpMp(HaveBattleStatus* self, int index);
         static void changeMonster(HaveBattleStatus* self, int index);
+        static void changeMonsterReverse(HaveBattleStatus* self);
+        static void newBaseChangeMonsterReverse2(HaveBattleStatus* self);
         static bool eventFlag_;
     };
 } 

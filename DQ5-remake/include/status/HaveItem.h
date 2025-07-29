@@ -10,14 +10,13 @@ namespace status {
       
         static bool isEquipmentInAllItem(const HaveItem* self, int itemIndex);
         static int getEquipmentItem(HaveItem* self, dq5::level::ItemType type, int index);
-        virtual int add(int itemIndex);
+        virtual int VHaveItemAdd(int itemIndex);
         static bool isSpace(HaveItem* self);
         static bool isSpell(const HaveItem* self);
         static void breakSpell(HaveItem* self);
         static void sortEquipment(HaveItem* self);
         static char sortEnable_;
         static void cleanup(HaveItem* self, int index);
-        // Constructeurs
         HaveItem() {
             BaseHaveItem(),
             item_ = itemArray_;

@@ -234,7 +234,7 @@ int status::ShopList::getHotelPrice(const ShopList* self, bool second)
 
 status::ShopList::ShopList()
 {
-    ;
+    
 }
 
 status::ShopList::~ShopList()

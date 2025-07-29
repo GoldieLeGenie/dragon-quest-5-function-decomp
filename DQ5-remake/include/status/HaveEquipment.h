@@ -1,6 +1,4 @@
-﻿// HaveEquipment.h
-#pragma once
-
+﻿#pragma once
 #include <cstdint>
 #include "status/HaveItem.h"
 #include "dq5/ItemType.h"
@@ -31,6 +29,12 @@ namespace status {
         static void clear(HaveEquipment* self);
         static void setup(HaveEquipment* self, HaveItem* haveItem);
         static void setup(HaveEquipment* self, int index);
+        ~HaveEquipment();
+        HaveEquipment() {
+            strength_ = attack_ = 0;
+        };
+
+     
     };
 
 } 

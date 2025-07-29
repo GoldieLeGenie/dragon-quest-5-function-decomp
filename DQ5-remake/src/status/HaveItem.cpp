@@ -36,7 +36,7 @@ int status::HaveItem::getEquipmentItem(HaveItem* self,dq5::level::ItemType type,
     return 0;
 }
 
-int status::HaveItem::add(int itemIndex)
+int status::HaveItem::VHaveItemAdd(int itemIndex)
 {
     return status::BaseHaveItem::addOne(this, itemIndex);
 }

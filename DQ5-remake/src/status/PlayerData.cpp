@@ -138,7 +138,6 @@ int status::PlayerData::getCgIndex(PlayerData* self) {
         return status::HaveStatusInfo::getSonCharaIndex();
     }
 
-    // Valeur par défaut : champ [24] de l'enregistrement binaire
     return record[24];
 }
 
@@ -320,14 +319,14 @@ void status::PlayerData::setup(PlayerData* self, bool useNameId, int kind, int p
 
     self->baseStatus_.exp_ = *reinterpret_cast<uint32_t*>(record + 0);
 
-    self->haveItem_.clear();
+    self->haveItem_.VBaseHaveItemClear();
 
 
     // Objets initiaux (équipements)
     for (int i = 0; i < 4; ++i) {
         uint16_t itemId = *reinterpret_cast<uint16_t*>(record + 24 + 2 * i);
         if (itemId != 0) {
-            int slot = self->haveItem_.add(itemId);
+            int slot = self->haveItem_.VHaveItemAdd(itemId);
             status::BaseHaveItem::setEquipment(&self->haveItem_, slot);
         }
     }

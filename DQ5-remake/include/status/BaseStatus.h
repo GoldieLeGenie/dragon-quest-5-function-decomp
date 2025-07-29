@@ -34,7 +34,7 @@ namespace status {
         static void addMpMax(BaseStatus* self, int8_t mp);
         static void addLuck(BaseStatus* self, uint8_t lc);
         BaseStatus() {
-            std::memset(this, 0, sizeof(*this));
+            std::memset(this, 0, 0x13);
         }
         ~BaseStatus();
         // Taille totale : 0x14 (20 octets)

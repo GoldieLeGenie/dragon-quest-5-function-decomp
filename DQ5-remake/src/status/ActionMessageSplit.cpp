@@ -1,4 +1,6 @@
 ﻿#include "status/ActionMessageSplit.h"
+#include "status/UseActionParam.h"
+#include "status/PartyStatus.h"
 #include "dq5/SplitMessage.h"
 #include "ar/rand.h"
 #include "iostream"
@@ -7,18 +9,19 @@
 char status::ActionMessageSplit::splitFlag_ = 0;
 int status::ActionMessageSplit::actionIndex_ = 0;
 
+
 int status::ActionMessageSplit::getMessageSpecial(int splitIndex)
 {
-    void* record = dq5::level::SplitMessage::binary_.getRecord(
+    status::splitMessage_ = reinterpret_cast<int>(dq5::level::SplitMessage::binary_.getRecord(
         splitIndex,
         dq5::level::SplitMessage::addr_,
         dq5::level::SplitMessage::filename_[0],
-        static_cast<ar::File::LoadSwitch>(dq5::level::SplitMessage::loadSwitch_)
+        static_cast<ar::File::LoadSwitch>(dq5::level::SplitMessage::loadSwitch_))
     );
 
-    status::splitMessage_ = reinterpret_cast<intptr_t>(record);
+   
 
-    int result = *reinterpret_cast<int*>(static_cast<uint8_t*>(record) + 216);
+    int result = status::splitMessage_ + 216;
 
     if (result != 0)
         status::ActionMessageSplit::splitFlag_ = 1;
@@ -29,11 +32,11 @@ int status::ActionMessageSplit::getMessageSpecial(int splitIndex)
 
 int status::ActionMessageSplit::getMessageZero(int splitIndex)
 {
-    void* record = dq5::level::SplitMessage::binary_.getRecord(
+    status::splitMessage_ = reinterpret_cast<int>(dq5::level::SplitMessage::binary_.getRecord(
         splitIndex,
         dq5::level::SplitMessage::addr_,
         dq5::level::SplitMessage::filename_[0],
-        static_cast<ar::File::LoadSwitch>(dq5::level::SplitMessage::loadSwitch_)
+        static_cast<ar::File::LoadSwitch>(dq5::level::SplitMessage::loadSwitch_))
     );
 
     return 0;
@@ -83,16 +86,15 @@ int status::ActionMessageSplit::getMessageNoTarget(int splitIndex)
 
     if (status::ActionMessageSplit::actionIndex_ == 132)
     {
-        void* record = dq5::level::SplitMessage::binary_.getRecord(
+        status::splitMessage_ = reinterpret_cast<int>(dq5::level::SplitMessage::binary_.getRecord(
             splitIndex,
             dq5::level::SplitMessage::addr_,
             dq5::level::SplitMessage::filename_[0],
-            static_cast<ar::File::LoadSwitch>(dq5::level::SplitMessage::loadSwitch_)
+            static_cast<ar::File::LoadSwitch>(dq5::level::SplitMessage::loadSwitch_))
         );
 
-        status::splitMessage_ = reinterpret_cast<std::intptr_t>(record);
-
-        int value = *reinterpret_cast<int32_t*>(reinterpret_cast<uint8_t*>(record) + 164);
+        
+        int value = status::splitMessage_ + 164;
         if (value != 0)
         {
             result = value;

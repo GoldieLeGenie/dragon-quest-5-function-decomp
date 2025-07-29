@@ -16,8 +16,20 @@ namespace status {
     struct HaveStatusInfo_0;
 
     
+    
 
     struct HaveStatusInfo {
+
+        enum class Condition : int32_t
+        {
+            ALIVE = 0,
+            DEAD = 1,
+            SLEEP = 2,
+            CONFUSION = 3,
+            SPAZZ = 4,
+            SPELL = 5,
+            POISON = 6,
+        };
 
         enum class DiffStatus : int32_t {
             BeforeAction = 0,
@@ -211,6 +223,52 @@ namespace status {
         static bool isKillMyself(HaveStatusInfo_0* self);
         static void setMonsterChange(HaveStatusInfo_0* self, bool flag);
         static void levelup(HaveStatusInfo_0* self, int level);
+        static void execDeath(HaveStatusInfo_0* self);
+        static void setupActionDefence(HaveStatusInfo_0* self, int index, bool flag);
+        static int getLevelupExp(const HaveStatusInfo_0* self);
+        static int getIconIndex(HaveStatusInfo_0* self);
+        static int getMpInBattle(HaveStatusInfo_0* self, status::HaveStatusInfo::DiffStatus status);
+        static uint16_t getMpMax(const HaveStatusInfo_0* self);
+        static int getSpecialTargetCount(HaveStatusInfo_0* self);
+        static int getSpecialTargetDamage(HaveStatusInfo_0* self);
+        static bool isAddEffectDamage(HaveStatusInfo_0* self);
+        static bool isAddEffectMahotora(HaveStatusInfo_0* self);
+        static bool isAddEffectPoison(HaveStatusInfo_0* self);
+        static bool isAddEffectRecovery(HaveStatusInfo_0* self);
+        static bool isAddEffectSleep(HaveStatusInfo_0* self);
+        static bool isAddEffectSpazz(HaveStatusInfo_0* self);
+        static bool isAddMahotoraExecute(HaveStatusInfo_0* self);
+        static bool isAstoron(HaveStatusInfo_0* self);
+        static bool isBaikirutoDisable(HaveStatusInfo_0* self);
+        static bool isBossDeathFlag(HaveStatusInfo_0* self);
+        static bool isCallFriend(HaveStatusInfo_0* self);
+        static void setupActionDefence(HaveStatusInfo_0* self);
+        static bool isConfuseMissAttack(HaveStatusInfo_0* self);
+        static bool isCounterDamage(status::HaveStatusInfo_0* self);
+        static status::HaveStatusInfo::Condition getCondition(HaveStatusInfo_0* self);
+        static bool isDisableTextureCache(HaveStatusInfo_0* self);
+        static bool isDeathLessly(HaveStatusInfo_0* self);
+        static bool isDisappearFlag(HaveStatusInfo_0* self);
+        static bool isEquipEnable(const HaveStatusInfo_0* self, int itemIndex);
+        static bool isEvilPriest(HaveStatusInfo_0* self);
+        static bool isExecuteMeganteRing(HaveStatusInfo_0* self);
+        static bool isFirstKaishin(HaveStatusInfo_0* self);
+        static bool isFirstMosyas(HaveStatusInfo_0* self);
+        static bool isFubahaFlag(HaveStatusInfo_0* self);
+        static bool isPlayer(const HaveStatusInfo_0* self, int playerIndex);
+        static bool isNeedRecovery(HaveStatusInfo_0* self);
+        static bool isMpFailure(HaveStatusInfo_0* self);
+        static bool isMultiFirstDeath(HaveStatusInfo_0* self);
+        static bool isNearDeath(const HaveStatusInfo_0* self);
+        static uint16_t getAttackChange(HaveStatusInfo_0* self);
+        static uint8_t getBaseAgility(HaveStatusInfo_0* self);
+        static uint16_t getBaseDefence(HaveStatusInfo_0* self);
+        static uint8_t getBeforeAgility(const HaveStatusInfo_0* self, int itemIndex);
+        static int16_t getBeforeAttack(const HaveStatusInfo_0* self, int itemIndex);
+        static int16_t getBeforeDefence(const HaveStatusInfo_0* self, int itemIndex);
+        static uint8_t getBeforeLuck(const HaveStatusInfo_0* self, int itemIndex);
+        static uint8_t getBeforeStrength(const HaveStatusInfo_0* self, int itemIndex);
+        static uint8_t getBeforeWisdom(const HaveStatusInfo_0* self, int itemIndex);
         HaveStatusInfo();
         ~HaveStatusInfo();
 

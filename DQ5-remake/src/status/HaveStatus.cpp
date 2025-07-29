@@ -752,3 +752,8 @@ status::HaveStatus::HaveStatus()
     this->baseStatus_ = BaseStatus(); 
 }
 
+
+int status::HaveStatus::getLevelupExp(const status::HaveStatus* self)
+{
+    return self->baseStatus_.exp_ - self->exp_;
+}

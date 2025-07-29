@@ -19,7 +19,6 @@
 #include "status/isDoubleAction.h"
 #include "status/HaveBattleStatus.h"
 #include "ar/rand.h"
-#include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
@@ -38,9 +37,6 @@
 #include "status/getUsuallyAttackEffectValueForAI.h"
 #include "status/BattleResult.h"
 
-int main() {
-
-}
 
 
 // Simule une initialisation de ActionParam
@@ -66,49 +62,49 @@ int main() {
 //
 //
 //
-//void initCharacterData() {
-//    using namespace dq5::level;
+void initCharacterData() {
+    using namespace dq5::level;
+
+    // Nom du fichier : dépendra de l'index, donc on peut charger un dummy d'abord (ex: index 0)
+
+    CharacterData::filename_[0] = "./LEVELDATA/dq5ds_player_level1.dat";
+
+
+    // Met à jour loadSwitch_ depuis levelData
+    CharacterData::loadSwitch_ = LevelData::getLoadType(&levelData, 28) != 0;
+
+    // Setup header pour un fichier réel
+    CharacterData::binary_.setupHeader(
+        CharacterData::filename_[0],
+        static_cast<ar::File::LoadSwitch>(CharacterData::loadSwitch_)
+    );
+
+    CharacterData::addr_ = CharacterData::binary_.setup();
+
+    if (!CharacterData::addr_) {
+        std::cerr << "Erreur : échec du setup() pour dq5ds_player_level0.dat\n";
+        std::exit(1);
+    }
+
+    std::cout << "CharacterData chargé. Enregistrements par fichier : " << CharacterData::binary_.record_ << "\n";
+}
 //
-//    // Nom du fichier : dépendra de l'index, donc on peut charger un dummy d'abord (ex: index 0)
-//
-//    CharacterData::filename_[0] = "./LEVELDATA/dq5ds_player_level1.dat";
-//
-//
-//    // Met à jour loadSwitch_ depuis levelData
-//    CharacterData::loadSwitch_ = LevelData::getLoadType(&levelData, 28) != 0;
-//
-//    // Setup header pour un fichier réel
-//    CharacterData::binary_.setupHeader(
-//        CharacterData::filename_[0],
-//        static_cast<ar::File::LoadSwitch>(CharacterData::loadSwitch_)
-//    );
-//
-//    CharacterData::addr_ = CharacterData::binary_.setup();
-//
-//    if (!CharacterData::addr_) {
-//        std::cerr << "Erreur : échec du setup() pour dq5ds_player_level0.dat\n";
-//        std::exit(1);
-//    }
-//
-//    std::cout << "CharacterData chargé. Enregistrements par fichier : " << CharacterData::binary_.record_ << "\n";
-//}
-//
-//void initItemData() {
-//    using namespace dq5::level;
-//
-//    ItemData::filename_[0] = "./LEVELDATA/dq5ds_item_list.dat";
-//    ItemData::loadSwitch_ = 1;
-//
-//    ItemData::binary_.setupHeader(ItemData::filename_[0], static_cast<ar::File::LoadSwitch>(ItemData::loadSwitch_));
-//    ItemData::addr_ = ItemData::binary_.setup();
-//
-//    if (!ItemData::addr_) {
-//        std::cerr << "Erreur : impossible de charger dq5ds_item_list.dat\n";
-//        std::exit(1);
-//    }
-//
-//    std::cout << "ItemData chargé. Nombre d'objets : " << ItemData::binary_.record_ << "\n";
-//}
+void initItemData() {
+    using namespace dq5::level;
+
+    ItemData::filename_[0] = "./DQ5-remake/LEVELDATA/dq5ds_item_list.dat";
+    ItemData::loadSwitch_ = 1;
+
+    ItemData::binary_.setupHeader(ItemData::filename_[0], static_cast<ar::File::LoadSwitch>(ItemData::loadSwitch_));
+    ItemData::addr_ = ItemData::binary_.setup();
+
+    if (!ItemData::addr_) {
+        std::cerr << "Erreur : impossible de charger dq5ds_item_list.dat\n";
+        std::exit(1);
+    }
+
+    std::cout << "ItemData chargé. Nombre d'objets : " << ItemData::binary_.record_ << "\n";
+}
 //
 //
 //void printAllArmorItemIDs() {
@@ -151,75 +147,84 @@ int main() {
 //
 
 
+int main() {
+    using namespace status;
 
-//int main() {
-//    using namespace status;
-//    initItemData();
-//
-//    HaveStatusInfo_0 character{};
-//    character.characterType_ = dq5::level::CharacterType::PLAYER;
-//
-//    // Setup des stats de base
-//    character.haveStatus_.baseStatus_.strength_ = 50;
-//    character.haveStatus_.baseStatus_.protection_ = 40;
-//    character.haveStatus_.baseStatus_.hpMax_ = 1100;
-//    character.haveStatus_.baseStatus_.mpMax_ = 100;
-//    character.haveStatus_.gold_ = 1234;
-//
-//    character.haveStatus_.setHp(80);
-//    character.haveStatus_.setMp(10);
-//
-//    character.flag2_.setValue(0x001C0000); 
-//    character.flag_.setValue(0x00000400);  
-//
-//    static HaveItem simulatedInventory;
-//    simulatedInventory.itemArray_[0].index_ = 1;
-//    simulatedInventory.itemMax_ = 12;
-//
-//    character.haveEquipment_.haveItem_ = &simulatedInventory;
-//
-//    character.haveEquipment_.strength_ = 20;
-//    character.haveEquipment_.attack_ = 15;
-//    character.haveEquipment_.defence_ = 30;
-//
-//    std::cout << "isDeath: " << HaveStatusInfo::isDeath(&character) << "\n";
-//    std::cout << "getHp: " << HaveStatusInfo::getHp(&character) << "\n";
-//    std::cout << "getGold: " << HaveStatusInfo::getGold(&character) << "\n";
-//
-//    HaveStatusInfo::clearHpInBattle(&character);
-//    std::cout << "After clearHpInBattle: " << character.hp_[0] << ", " << character.hp_[1] << "\n";
-//
-//    HaveStatusInfo::clearMpInBattle(&character);
-//    std::cout << "After clearMpInBattle: " << character.mp_[0] << ", " << character.mp_[1] << "\n";
-//
-//    HaveStatusInfo::clearStatusChangeInBattle(&character);
-//    std::cout << "StatusChange (BeforeAction): " << character.status_[0].get() << "\n";
-//
-//    std::cout << "isMultiAttack: " << HaveStatusInfo::isMultiAttack(&character) << "\n";
-//
-//    HaveStatusInfo::setMultiAttack(&character, false);
-//    std::cout << "After clear: isMultiAttack: " << HaveStatusInfo::isMultiAttack(&character) << "\n";
-//
-//    HaveStatusInfo::setMultiAttack(&character, true);
-//    std::cout << "After set: isMultiAttack: " << HaveStatusInfo::isMultiAttack(&character) << "\n";
-//
-//    HaveStatusInfo::setImmediateDeathItem(&character, true);
-//    std::cout << std::hex << "flag2 (after set true): " << character.flag2_.get() << "\n";
-//    HaveStatusInfo::setImmediateDeathItem(&character, false);
-//    std::cout << "flag2 (after set false): " << character.flag2_.get() << "\n";
-//
-//    // Test attaque / défense
-//    std::cout << std::dec;
-//    std::cout << "getAttack: " << HaveStatusInfo::getAttack(&character, 0) << "\n";
-//    std::cout << "getDefence: " << HaveStatusInfo::getDefence(&character, 0) << "\n";
-//
-//    // Kaishin / Tsukon
-//    std::cout << "isKaishin: " << HaveStatusInfo::isKaishin(&character) << "\n";
-//    std::cout << "isTsukon1: " << HaveStatusInfo::isTsukon1(&character) << "\n";
-//    std::cout << "isTsukon2: " << HaveStatusInfo::isTsukon2(&character) << "\n";
-//
-//    // HP Max
-//    std::cout << "getHpMax: " << HaveStatusInfo::getHpMax(&character) << "\n";
-//    
-//    return 0;
-//}
+    initItemData(); // Initialise les données d'objets (probablement une table statique)
+
+    // Création d’un personnage joueur
+    HaveStatusInfo_0 character{};
+    character.characterType_ = dq5::level::CharacterType::PLAYER;
+
+    // Configuration des statistiques de base
+    character.haveStatus_.baseStatus_.strength_ = 50;
+    character.haveStatus_.baseStatus_.protection_ = 40;
+    character.haveStatus_.baseStatus_.hpMax_ = 1100;
+    character.haveStatus_.baseStatus_.mpMax_ = 100;
+    character.haveStatus_.gold_ = 1234;
+
+    // Remplissage des HP/MP actuels
+    character.haveStatus_.setHp(&character.haveStatus_, 80);
+    character.haveStatus_.setMp(&character.haveStatus_, 10);
+
+    // Flags d'état
+    character.flag2_.setValue(0x001C0000);
+    character.flag_.setValue(0x00000400);
+
+    // Inventaire simulé
+    static HaveItem simulatedInventory;
+    simulatedInventory.itemArray_[0].index_ = 1;
+    simulatedInventory.itemMax_ = 12;
+
+    character.haveEquipment_.haveItem_ = &simulatedInventory;
+
+    // Équipement
+    character.haveEquipment_.strength_ = 20;
+    character.haveEquipment_.attack_ = 15;
+    character.haveEquipment_.defence_ = 30;
+
+    // Tests de récupération de statut
+    std::cout << "isDeath: " << HaveStatusInfo::isDeath(&character) << "\n";
+    std::cout << "getHp: " << HaveStatusInfo::getHp(&character) << "\n";
+    std::cout << "getGold: " << HaveStatusInfo::getGold(&character) << "\n";
+
+    // Réinitialisation des HP/MP pour le combat
+    HaveStatusInfo::clearHpInBattle(&character);
+    std::cout << "After clearHpInBattle: " << character.hp_[0] << ", " << character.hp_[1] << "\n";
+
+    HaveStatusInfo::clearMpInBattle(&character);
+    std::cout << "After clearMpInBattle: " << character.mp_[0] << ", " << character.mp_[1] << "\n";
+
+    // Nettoyage des changements de statut
+    HaveStatusInfo::clearStatusChangeInBattle(&character);
+    std::cout << "StatusChange (BeforeAction): " << character.status_[0].get() << "\n";
+
+    // Test multi-attaque
+    std::cout << "isMultiAttack: " << HaveStatusInfo::isMultiAttack(&character) << "\n";
+    HaveStatusInfo::setMultiAttack(&character, false);
+    std::cout << "After clear: isMultiAttack: " << HaveStatusInfo::isMultiAttack(&character) << "\n";
+    HaveStatusInfo::setMultiAttack(&character, true);
+    std::cout << "After set: isMultiAttack: " << HaveStatusInfo::isMultiAttack(&character) << "\n";
+
+    // Test objet de mort instantanée
+    HaveStatusInfo::setImmediateDeathItem(&character, true);
+    std::cout << std::hex << "flag2 (after set true): " << character.flag2_.get() << "\n";
+    HaveStatusInfo::setImmediateDeathItem(&character, false);
+    std::cout << "flag2 (after set false): " << character.flag2_.get() << "\n";
+
+    // Affichage des valeurs d'attaque/défense
+    std::cout << std::dec;
+    std::cout << "getAttack: " << HaveStatusInfo::getAttack(&character, 0) << "\n";
+    std::cout << "getDefence: " << HaveStatusInfo::getDefence(&character, 0) << "\n";
+
+    // Tests spéciaux
+    std::cout << "isKaishin: " << HaveStatusInfo::isKaishin(&character) << "\n";
+    std::cout << "isTsukon1: " << HaveStatusInfo::isTsukon1(&character) << "\n";
+    std::cout << "isTsukon2: " << HaveStatusInfo::isTsukon2(&character) << "\n";
+
+    // HP Max
+    std::cout << "getHpMax: " << HaveStatusInfo::getHpMax(&character) << "\n";
+
+    return 0;
+}
+

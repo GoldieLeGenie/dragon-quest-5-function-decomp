@@ -425,7 +425,6 @@ int status::StatusChangeOne::getEffectMessage(int index, int actionIndex) {
         matchedRecord = getRecord(0);
     }
 
-    // Stocker le pointeur trouvé
     status::effectMessage_ = reinterpret_cast<std::uintptr_t>(matchedRecord);
 
     return matchedIndex;

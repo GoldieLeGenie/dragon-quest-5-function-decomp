@@ -3,6 +3,8 @@
 #include "status/ItemData.h"
 #include "status/UseItem.h"
 #include <cstring>
+#include "iostream"
+
 
 int status::BaseHaveItem::addNum(BaseHaveItem* self, int itemIndex, int count)
 {
@@ -82,7 +84,7 @@ void status::BaseHaveItem::sort(BaseHaveItem* self) {
     delete[] temp;
 }
 
-int status::BaseHaveItem::add(int itemIndex)
+int status::BaseHaveItem::VBaseHaveItemAdd(int itemIndex)
 {
     if (itemIndex == 0)
         return -1; 
@@ -110,14 +112,14 @@ int status::BaseHaveItem::add(int itemIndex)
 }
 
 
-bool status::BaseHaveItem::del(int ctrlId) {
+bool status::BaseHaveItem::VBaseHaveItemDel(int ctrlId) {
     if (ctrlId < 0 || ctrlId >= this->itemMax_ || this->item_ == nullptr) return false;
     this->item_[ctrlId] = ItemData();
     status::BaseHaveItem::sort(this);
     return true;
 }
 
-void status::BaseHaveItem::sortEquipment(BaseHaveItem* self) {
+void status::BaseHaveItem::VBaseHaveItemSortEquipment(BaseHaveItem* self) {
 }
 
 status::BaseHaveItem::BaseHaveItem() : item_(nullptr), itemMax_(0) {}
@@ -154,7 +156,7 @@ bool status::BaseHaveItem::isEquipment(const BaseHaveItem* self,int index){
 void status::BaseHaveItem::resetEquipment(BaseHaveItem* self, int index) {
     if (index < 0 || index >= self->itemMax_ || self->item_ == nullptr) return;
     self->item_[index].flag_.clear(0);
-    self->sortEquipment(self);
+    self->VBaseHaveItemSortEquipment(self);
 }
 
 int status::BaseHaveItem::getItemSortIndex(const BaseHaveItem* self, int itemIndex){
@@ -192,7 +194,7 @@ void status::BaseHaveItem::setEquipment(BaseHaveItem* self, int index) {
         item.flag_.set(1);
     }
 
-    self->sortEquipment(self);
+    self->VBaseHaveItemSortEquipment(self);
 
 }
 
@@ -218,7 +220,7 @@ status::BaseHaveItem::BaseHaveItem(ItemData* itemData, int itemMax)
     }
 }
 
-void status::BaseHaveItem::clear() {
+void status::BaseHaveItem::VBaseHaveItemClear() {
     if (this->item_ && this->itemMax_ >= 1)
         for (int i = 0; i < this->itemMax_; ++i)
             this->item_[i] = ItemData();
@@ -260,7 +262,20 @@ int status::BaseHaveItem::addOne(BaseHaveItem* self,int itemIndex) {
 }
 
 
-void status::BaseHaveItem::execThrow(int index, BaseHaveItem* haveItem) {
-    haveItem->del(index);  
-}
+bool status::BaseHaveItem::delNum(BaseHaveItem* self, int ctrlId)
+{
+    status::ItemData* item;
+    uint8_t  count;
 
+    item = &self->item_[ctrlId];
+    if (!item->count_)
+        return 0;
+    count = item->count_ - 1;
+    item->count_ = count;
+    if (!count)
+    {
+        item->index_ = 0;
+        status::BaseHaveItem::sort(self);
+    }
+    return 1;
+}
