@@ -15,7 +15,7 @@
 bool status::ActionEffectValue::specialTargetEffectValue_ = false;
 
 
-void __fastcall status::ActionEffectValue::setEffectValue(UseActionParam* useActionParam, bool flag)
+void status::ActionEffectValue::setEffectValue(UseActionParam* useActionParam, bool flag)
 {
     // Étape 1 : vérifier s’il s’agit d’une attaque multi-cible ou multiple
     status::ActionEffectValue::checkMultiAttack(useActionParam);
@@ -46,7 +46,7 @@ void status::ActionEffectValue::checkMultiAttack(UseActionParam* useActionParam)
     }
 }
 
-void __fastcall status::ActionEffectValue::setEffectValueNormalAttack(status::UseActionParam* useActionParam)
+void status::ActionEffectValue::setEffectValueNormalAttack(status::UseActionParam* useActionParam)
 {
     if (!useActionParam)
         return;
